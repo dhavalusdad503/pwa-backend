@@ -13,6 +13,8 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
+
+    // 👇 keep this for your path aliases to work (for now)
     "baseUrl": ".",
     "paths": {
       "@*": ["src/*"],
@@ -22,7 +24,10 @@
       "@middlewares/*": ["src/middlewares/*"],
       "@utils/*": ["src/utils/*"],
       "@config/*": ["src/config/*"]
-    }
+    },
+
+    // 👇 add this line to silence the deprecation warning
+    // "ignoreDeprecations": "6.0"
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
