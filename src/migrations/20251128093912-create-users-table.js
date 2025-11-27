@@ -10,11 +10,15 @@ module.exports = {
     await queryInterface.createTable('users', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
       },
-      name: {
+      first_name: {
+        type: Sequelize.STRING(100),
+        allowNull: false
+      },
+      last_name: {
         type: Sequelize.STRING(100),
         allowNull: false
       },
@@ -23,23 +27,40 @@ module.exports = {
         allowNull: false,
         unique: true
       },
+      phone: {
+        type: Sequelize.STRING(20),
+        allowNull: true
+      },
       password: {
         type: Sequelize.STRING(255),
-        allowNull: false
+        allowNull: true
       },
-      createdAt: {
+      role_id: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'roles',
+          key: 'id'
+        }
+      },
+      active: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+      },
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
       }
     });
 
-    // Add index on email for faster lookups
+    // Add index on email
     await queryInterface.addIndex('users', ['email']);
   },
 

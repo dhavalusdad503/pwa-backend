@@ -2,6 +2,8 @@ import bcrypt from 'bcrypt';
 import User from '../models/user.model';
 import { BaseSeeder } from './base.seeder';
 import logger from '@utils/logger';
+import Role from '@models/roles.model';
+import { Roles } from '@enums';
 
 export class UserSeeder extends BaseSeeder {
   constructor() {
@@ -17,21 +19,32 @@ export class UserSeeder extends BaseSeeder {
         return;
       }
 
+      const roles = await Role.findAll();
+      const superRole = roles.find(role => role.name === Roles.SUPER);
+      const adminRole = roles.find(role => role.name === Roles.ADMIN);
+      const userRole = roles.find(role => role.name === Roles.USER);
+
+      if(!superRole || !adminRole || !userRole) {
+        logger.error('❌ Roles not found, skipping users seeding...');
+        return;
+      }
+
       const users = [
         {
-          name: 'John Doe',
-          email: 'john@example.com',
-          password: await bcrypt.hash('password123', 10),
+          firstName: 'Admin1',
+          lastName: 'Admin1',
+          email: 'admin1@yopmail.com',
+          active: true,
+          roleId: superRole?.id,
+          password: await bcrypt.hash('admin@123', 10),
         },
         {
-          name: 'Jane Smith',
-          email: 'jane@example.com',
-          password: await bcrypt.hash('password123', 10),
-        },
-        {
-          name: 'Admin User',
-          email: 'admin@example.com',
-          password: await bcrypt.hash('admin123', 10),
+          firstName: 'User1',
+          lastName: 'User1',
+          email: 'user1@yopmail.com',
+          active: true,
+          roleId: userRole?.id,
+          password: await bcrypt.hash('user@123', 10),
         },
       ];
 

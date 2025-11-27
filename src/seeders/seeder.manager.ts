@@ -4,11 +4,14 @@ import { BaseSeeder } from './base.seeder';
 import { UserSeeder } from './user.seeder';
 // import { ProductSeeder } from './product.seeder';
 
+import { RoleSeeder } from './role.seeder';
+
 export class SeederManager {
   private seeders: BaseSeeder[];
 
   constructor() {
     this.seeders = [
+      new RoleSeeder(),
       new UserSeeder(),
     ];
   }
@@ -16,7 +19,7 @@ export class SeederManager {
   async runAll(): Promise<void> {
     try {
       logger.info('🚀 Starting database seeding...');
-      
+
       // Test database connection
       await sequelize.authenticate();
       logger.info('✅ Database connection established.');
@@ -25,7 +28,7 @@ export class SeederManager {
       for (const seeder of this.seeders) {
         await seeder.run();
       }
-      
+
       logger.info('🎉 All seeders completed successfully!');
     } catch (error) {
       logger.error('❌ Seeding failed:', error);
@@ -38,7 +41,7 @@ export class SeederManager {
   async runSpecific(seederName: string): Promise<void> {
     try {
       logger.info(`🚀 Running ${seederName} seeder...`);
-      
+
       await sequelize.authenticate();
       logger.info('✅ Database connection established.');
 

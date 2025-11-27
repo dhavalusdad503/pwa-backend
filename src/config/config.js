@@ -9,8 +9,11 @@ module.exports = {
     port: parseInt(process.env.DB_PORT || '5432'),
     dialect: 'postgres',
     dialectOptions: {
-      ssl: true
-    }
+      ssl: {
+        require: true,
+        rejectUnauthorized: false, // only for dev
+      },
+    },
   },
   production: {
     use_env_variable: 'DATABASE_URL',
@@ -18,7 +21,7 @@ module.exports = {
     dialectOptions: {
       ssl: {
         require: true,
-        rejectUnauthorized: false
+        // rejectUnauthorized: false //"Insecure" for production
       }
     }
   }
