@@ -7,7 +7,6 @@ import { errorResponse } from './responseHandler';
 export const validationMiddleware = <T extends ObjectSchema>(type: T, value: 'body' | 'query' | 'params' | 'headers' = 'body'): RequestHandler => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
-            console.log(req.body, "hit the api");
             req[value] = await type.validateAsync(req[value]);
             return next();
         } catch (error) {
