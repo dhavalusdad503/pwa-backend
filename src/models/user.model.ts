@@ -9,6 +9,7 @@ import {
 } from 'sequelize';
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { AuthProvider, UserStatus } from '@enums';
 
 
 // // User Model Class
@@ -22,7 +23,8 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare phone: CreationOptional<string | null>;
   declare roleId: string;
   declare password: CreationOptional<string>;
-  declare active: boolean;
+  declare authProvider: string;
+  declare status: string;
   declare readonly createdAt: CreationOptional<Date>;
   declare readonly updatedAt: CreationOptional<Date>;
 
@@ -37,6 +39,12 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     });
   }
 
+  public static USER_FIRST_NAME_MAX_LENGTH = 100;
+  public static USER_LAST_NAME_MAX_LENGTH = 100;
+  public static USER_EMAIL_MAX_LENGTH = 150;
+  public static USER_PHONE_MAX_LENGTH = 20;
+  public static USER_PASSWORD_MAX_LENGTH = 255;
+
   public static initModel(sequelize: Sequelize): typeof User {
     User.init(
       {
@@ -47,17 +55,17 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
           allowNull: false,
         },
         firstName: {
-          type: DataTypes.STRING(100),
+          type: DataTypes.STRING(this.USER_FIRST_NAME_MAX_LENGTH),
           allowNull: false,
           field: 'first_name',
         },
         lastName: {
-          type: DataTypes.STRING(100),
+          type: DataTypes.STRING(this.USER_LAST_NAME_MAX_LENGTH),
           allowNull: false,
           field: 'last_name',
         },
         email: {
-          type: DataTypes.STRING(150),
+          type: DataTypes.STRING(this.USER_EMAIL_MAX_LENGTH),
           allowNull: false,
           unique: true,
           validate: {
@@ -65,11 +73,11 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
           },
         },
         phone: {
-          type: DataTypes.STRING(20),
+          type: DataTypes.STRING(this.USER_PHONE_MAX_LENGTH),
           allowNull: true,
         },
         password: {
-          type: DataTypes.STRING(255),
+          type: DataTypes.STRING(this.USER_PASSWORD_MAX_LENGTH),
           allowNull: false,
           field: 'password',
         },
@@ -83,9 +91,14 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
           },
           onDelete: 'RESTRICT',
         },
-        active: {
-          type: DataTypes.BOOLEAN,
-          defaultValue: true,
+        status: {
+          type: DataTypes.ENUM(UserStatus.ACTIVE, UserStatus.INACTIVE),
+          defaultValue: UserStatus.ACTIVE,
+          allowNull: false,
+        },
+        authProvider: {
+          type: DataTypes.ENUM(AuthProvider.EMAIL, AuthProvider.GOOGLE, AuthProvider.FACEBOOK, AuthProvider.GITHUB, AuthProvider.TWITTER),
+          defaultValue: AuthProvider.EMAIL,
           allowNull: false,
         },
         createdAt: {

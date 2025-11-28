@@ -3,7 +3,7 @@ import User from '../models/user.model';
 import { BaseSeeder } from './base.seeder';
 import logger from '@utils/logger';
 import Role from '@models/roles.model';
-import { Roles } from '@enums';
+import { AuthProvider, Roles, UserStatus } from '@enums';
 
 export class UserSeeder extends BaseSeeder {
   constructor() {
@@ -34,16 +34,18 @@ export class UserSeeder extends BaseSeeder {
           firstName: 'Admin1',
           lastName: 'Admin1',
           email: 'admin1@yopmail.com',
-          active: true,
           roleId: superRole?.id,
+          status: UserStatus.ACTIVE,
+          authProvider: AuthProvider.EMAIL,
           password: await bcrypt.hash('admin@123', 10),
         },
         {
           firstName: 'User1',
           lastName: 'User1',
           email: 'user1@yopmail.com',
-          active: true,
           roleId: userRole?.id,
+          status: UserStatus.ACTIVE,
+          authProvider: AuthProvider.EMAIL,
           password: await bcrypt.hash('user@123', 10),
         },
       ];

@@ -4,6 +4,8 @@ import { Model, DataTypes, Sequelize, InferAttributes, InferCreationAttributes, 
 class Role extends Model<InferAttributes<Role>, InferCreationAttributes<Role>> {
   declare id: CreationOptional<string>;
   declare name: string;
+  declare slug: string;
+  declare createdAt: CreationOptional<Date>;
 
   public static initModel(sequelize: Sequelize): typeof Role {
     Role.init(
@@ -18,6 +20,17 @@ class Role extends Model<InferAttributes<Role>, InferCreationAttributes<Role>> {
           type: DataTypes.STRING(50),
           allowNull: false,
           unique: true,
+        },
+        slug: {
+          type: DataTypes.STRING(50),
+          allowNull: false,
+          unique: true,
+        },
+        createdAt: {
+          type: DataTypes.DATE,
+          defaultValue: DataTypes.NOW,
+          allowNull: false,
+          field: 'created_at',
         },
       },
       {

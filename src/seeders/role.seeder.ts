@@ -2,6 +2,7 @@ import { Roles } from '@enums';
 import Role from '../models/roles.model';
 import { BaseSeeder } from './base.seeder';
 import logger from '@utils/logger';
+import { UserRoleSlugs } from '@constants';
 
 export class RoleSeeder extends BaseSeeder {
   constructor() {
@@ -22,9 +23,9 @@ export class RoleSeeder extends BaseSeeder {
       }
 
       const roles = [
-        { name: Roles.SUPER },
-        { name: Roles.ADMIN },
-        { name: Roles.USER },
+        { name: Roles.SUPER, slug: UserRoleSlugs[Roles.SUPER] },
+        { name: Roles.ADMIN, slug: UserRoleSlugs[Roles.ADMIN] },
+        { name: Roles.USER, slug: UserRoleSlugs[Roles.USER] },
       ];
 
       const createdRoles = await Role.bulkCreate(roles);

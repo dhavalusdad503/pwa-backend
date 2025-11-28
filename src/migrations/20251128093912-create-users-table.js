@@ -43,10 +43,15 @@ module.exports = {
           key: 'id'
         }
       },
-      active: {
-        type: Sequelize.BOOLEAN,
+      status: {
+        type: Sequelize.STRING,
         allowNull: false,
-        defaultValue: true
+        defaultValue: 'ACTIVE'
+      },
+      auth_provider: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: 'email'
       },
       created_at: {
         allowNull: false,

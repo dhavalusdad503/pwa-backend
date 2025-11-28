@@ -19,6 +19,16 @@ module.exports = {
         type: Sequelize.STRING,
         unique: true,
       },
+      slug: {
+        allowNull: false,
+        type: Sequelize.STRING,
+        unique: true,
+      },
+      created_at: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW,
+      }
     });
   },
 
