@@ -4,6 +4,7 @@ import User from './user.model';
 import Organization from './organization.model';
 import OrgUser from './org-user.model';
 import Patient from './patient.model';
+import Visit from './visit.model';
 
 export const initModels = () => {
   // Initialize models
@@ -12,6 +13,7 @@ export const initModels = () => {
   Organization.initModel(sequelize);
   OrgUser.initModel(sequelize);
   Patient.initModel(sequelize);
+  Visit.initModel(sequelize);
 
   // Initialize associations
   const models = {
@@ -20,6 +22,7 @@ export const initModels = () => {
     Organization,
     OrgUser,
     Patient,
+    Visit,
   };
 
   Role.associate(models);
@@ -27,6 +30,7 @@ export const initModels = () => {
   Organization.associate(models);
   OrgUser.associate(models);
   Patient.associate(models);
+  Visit.associate(models);
 };
 
-export { Role, User, Organization, OrgUser, Patient };
+export { Role, User, Organization, OrgUser, Patient, Visit };

@@ -21,6 +21,11 @@ class UserRepository extends BaseRepository<User> implements IUserRepository {
     return await this.findOne({ where: { email } });
   }
 
+  async dataExists(): Promise<boolean> {
+    const count = await this.count();
+    return count > 0;
+  }
+
 }
 
 export default new UserRepository();

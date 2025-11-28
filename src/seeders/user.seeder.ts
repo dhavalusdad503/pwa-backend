@@ -1,30 +1,34 @@
 import bcrypt from 'bcrypt';
-import User from '../models/user.model';
-import { BaseSeeder } from './base.seeder';
 import logger from '@utils/logger';
-import Role from '@models/roles.model';
 import { AuthProvider, Roles, UserStatus } from '@enums';
+import { UserRepository } from '@features/user';
+import { RoleRepository } from '@features/roles';
 
-export class UserSeeder extends BaseSeeder {
+export class UserSeeder {
+
+  private userRepository: typeof UserRepository;
+  private roleRepository: typeof RoleRepository;
+
   constructor() {
-    super(User);
+    this.userRepository = UserRepository;
+    this.roleRepository = RoleRepository;
   }
 
   async run(): Promise<void> {
     try {
       logger.info('Seeding users...');
 
-      if (await this.exists()) {
+      if (await this.userRepository.dataExists()) {
         logger.warn('Users already exist, skipping...');
         return;
       }
 
-      const roles = await Role.findAll();
+      const roles = await this.roleRepository.findAll();
       const adminRole = roles.find(role => role.name === Roles.ADMIN);
       const supervisorRole = roles.find(role => role.name === Roles.SUPERVISOR);
       const caregiverRole = roles.find(role => role.name === Roles.CAREGIVER);
 
-      if(!adminRole || !supervisorRole || !caregiverRole) {
+      if (!adminRole || !supervisorRole || !caregiverRole) {
         logger.error('Roles not found, skipping users seeding...');
         return;
       }
@@ -50,7 +54,7 @@ export class UserSeeder extends BaseSeeder {
         },
       ];
 
-      await User.bulkCreate(users);
+      await this.userRepository.bulkCreate(users);
       logger.info('Users seeded successfully!');
     } catch (error) {
       logger.error('Error seeding users:', error);

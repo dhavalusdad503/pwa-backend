@@ -1,6 +1,5 @@
 import logger from '@utils/logger';
 import { sequelize } from '../database/db';
-import { BaseSeeder } from './base.seeder';
 import { UserSeeder } from './user.seeder';
 // import { ProductSeeder } from './product.seeder';
 
@@ -10,7 +9,7 @@ import { PatientSeeder } from './patient.seeder';
 import { OrgUserSeeder } from './org-user.seeder';
 
 export class SeederManager {
-  private seeders: BaseSeeder[];
+  private seeders;
 
   constructor() {
     this.seeders = [

@@ -1,23 +1,27 @@
-import Patient from '../models/patient.model';
-import Organization from '../models/organization.model';
-import { BaseSeeder } from './base.seeder';
 import logger from '@utils/logger';
+import { PatientRepository } from '@features/patient';
+import { OrganizationRepository } from '@features/organization';
 
-export class PatientSeeder extends BaseSeeder {
+export class PatientSeeder {
+
+  private patientRepository: typeof PatientRepository;
+  private organizationRepository: typeof OrganizationRepository;
+
   constructor() {
-    super(Patient);
+    this.patientRepository = PatientRepository;
+    this.organizationRepository = OrganizationRepository;
   }
 
   async run(): Promise<void> {
     try {
       logger.info('Seeding patients...');
 
-      if (await this.exists()) {
+      if (await this.patientRepository.dataExists()) {
         logger.warn('Patients already exist, skipping creation...');
         return;
       }
 
-      const organization = await Organization.findOne({ where: { name: 'organization1' } });
+      const organization = await this.organizationRepository.findByName('organization1');
 
       if (!organization) {
         logger.error('Organization not found, skipping patients seeding...');
@@ -30,7 +34,7 @@ export class PatientSeeder extends BaseSeeder {
         { name: 'patient3', orgId: organization.id },
       ];
 
-      await Patient.bulkCreate(patients);
+      await this.patientRepository.bulkCreate(patients);
 
       logger.info('Patients seeded successfully!');
     } catch (error) {
@@ -39,3 +43,4 @@ export class PatientSeeder extends BaseSeeder {
     }
   }
 }
+

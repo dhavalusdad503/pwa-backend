@@ -1,21 +1,23 @@
 import { Roles } from '@enums';
-import Role from '../models/roles.model';
-import { BaseSeeder } from './base.seeder';
 import logger from '@utils/logger';
 import { UserRoleSlugs } from '@constants';
+import { RoleRepository } from '@features/roles';
 
-export class RoleSeeder extends BaseSeeder {
+export class RoleSeeder {
+
+  private roleRepository: typeof RoleRepository;
+
   constructor() {
-    super(Role);
+    this.roleRepository = RoleRepository;
   }
 
   async run(): Promise<void> {
     try {
       logger.info('Seeding roles...');
 
-      if (await this.exists()) {
+      if (await this.roleRepository.dataExists()) {
         logger.warn('Roles already exist, skipping creation...');
-        const existingRoles = await Role.findAll();
+        const existingRoles = await this.roleRepository.findAll();
         existingRoles.forEach(role => {
           logger.info(`Existing Role: ${role.name}, ID: ${role.id}`);
         });
@@ -28,7 +30,7 @@ export class RoleSeeder extends BaseSeeder {
         { name: Roles.ADMIN, slug: UserRoleSlugs[Roles.ADMIN] },
       ];
 
-      await Role.bulkCreate(roles);
+      await this.roleRepository.bulkCreate(roles);
 
       logger.info('Roles seeded successfully!');
     } catch (error) {
@@ -37,3 +39,4 @@ export class RoleSeeder extends BaseSeeder {
     }
   }
 }
+
