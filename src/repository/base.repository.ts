@@ -1,4 +1,10 @@
-import { Model, Transaction, FindOptions, CreateOptions, ModelStatic } from 'sequelize';
+import {
+  Model,
+  Transaction,
+  FindOptions,
+  CreateOptions,
+  ModelStatic,
+} from "sequelize";
 
 export interface IBaseRepository<T extends Model> {
   findById(id: string | number, options?: FindOptions): Promise<T | null>;
@@ -27,14 +33,17 @@ export abstract class BaseRepository<T extends Model> implements IBaseRepository
   }
 
   async findAll(options?: FindOptions): Promise<T[]> {
-    return await this.model.findAll(options) as T[];
+    return (await this.model.findAll(options)) as T[];
   }
 
   async findOne(options: FindOptions): Promise<T | null> {
-    return await this.model.findOne(options) as T | null;
+    return (await this.model.findOne(options)) as T | null;
   }
-  async create(data: T["_creationAttributes"], options?: CreateOptions): Promise<T> {
-    return await this.model.create(data, options) as T;
+  async create(
+    data: T["_creationAttributes"],
+    options?: CreateOptions
+  ): Promise<T> {
+    return (await this.model.create(data, options)) as T;
   }
 
   async update(id: string | number, data: Partial<T>, transaction?: Transaction): Promise<T> {
@@ -42,7 +51,7 @@ export abstract class BaseRepository<T extends Model> implements IBaseRepository
     if (!instance) {
       throw new Error(`${this.model.name} not found`);
     }
-    return await instance.update(data, { transaction }) as T;
+    return (await instance.update(data, { transaction })) as T;
   }
 
   async delete(id: string | number): Promise<boolean> {

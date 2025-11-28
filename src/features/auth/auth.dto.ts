@@ -2,12 +2,13 @@ import { AuthProvider, Roles } from "@enums";
 import { joiCommon } from "@helper/joi-schema.helper";
 import Joi from "joi";
 
-
 export const registerSchema = Joi.object({
   firstName: joiCommon.joiString.max(100).required(),
   lastName: joiCommon.joiString.max(100).required(),
   password: joiCommon.joiString.min(8).required(),
-  authProvider: joiCommon.joiString.valid(...Object.values(AuthProvider)).required(),
+  authProvider: joiCommon.joiString
+    .valid(...Object.values(AuthProvider))
+    .required(),
   phone: joiCommon.joiString.max(20),
   email: joiCommon.joiEmail.required(),
 });
@@ -29,4 +30,17 @@ export interface RegisterDto {
 export interface LoginDto {
   email: string;
   password: string;
+}
+
+export interface ResponseLoginData {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  authProvider: string;
+  role: {
+    name: string;
+    slug: string;
+    id: string;
+  };
 }

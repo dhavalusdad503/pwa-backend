@@ -16,7 +16,7 @@ export class UserSeeder {
 
   async run(): Promise<void> {
     try {
-      logger.info('Seeding users...');
+      logger.info("Seeding users...");
 
       if (await this.userRepository.dataExists()) {
         logger.warn('Users already exist, skipping...');
@@ -35,29 +35,38 @@ export class UserSeeder {
 
       const users = [
         {
-          firstName: 'Admin1',
-          lastName: 'Admin1',
-          email: 'admin1@yopmail.com',
+          firstName: "Admin1",
+          lastName: "Admin1",
+          email: "admin1@yopmail.com",
           roleId: adminRole?.id,
           status: UserStatus.ACTIVE,
           authProvider: AuthProvider.EMAIL,
-          password: await bcrypt.hash('admin@123', 10),
+          password: await bcrypt.hash("admin@123", 10),
         },
         {
-          firstName: 'User1',
-          lastName: 'User1',
-          email: 'user1@yopmail.com',
+          firstName: "User1",
+          lastName: "User1",
+          email: "user1@yopmail.com",
           roleId: caregiverRole?.id,
           status: UserStatus.ACTIVE,
           authProvider: AuthProvider.EMAIL,
-          password: await bcrypt.hash('user@123', 10),
+          password: await bcrypt.hash("user@123", 10),
+        },
+        {
+          firstName: "SuperVisor1",
+          lastName: "SuperVisor1",
+          email: "SuperVisor1@yopmail.com",
+          roleId: supervisorRole?.id,
+          status: UserStatus.ACTIVE,
+          authProvider: AuthProvider.EMAIL,
+          password: await bcrypt.hash("supervisor@123", 10),
         },
       ];
 
       await this.userRepository.bulkCreate(users);
       logger.info('Users seeded successfully!');
     } catch (error) {
-      logger.error('Error seeding users:', error);
+      logger.error("Error seeding users:", error);
       throw error;
     }
   }
