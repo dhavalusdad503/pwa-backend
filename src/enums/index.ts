@@ -1,7 +1,7 @@
 export enum Roles {
-    SUPER = 'SUPER',
+    CAREGIVER = 'CAREGIVER',
+    SUPERVISOR = 'SUPERVISOR',
     ADMIN = 'ADMIN',
-    USER = 'USER',
 }
 
 export enum UserStatus {

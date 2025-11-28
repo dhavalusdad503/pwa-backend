@@ -8,7 +8,7 @@ export const JWT_CONFIG = {
 };
 
 export const UserRoleSlugs: Record<Roles, string> = {
-    [Roles.SUPER]: 'SUP',
-    [Roles.ADMIN]: 'ADM',
-    [Roles.USER]: 'USR',
+  [Roles.SUPERVISOR]: 'SPV',
+  [Roles.ADMIN]: 'ADM',
+  [Roles.CAREGIVER]: 'CARE',
 };

@@ -5,6 +5,9 @@ import { UserSeeder } from './user.seeder';
 // import { ProductSeeder } from './product.seeder';
 
 import { RoleSeeder } from './role.seeder';
+import { OrganizationSeeder } from './organization.seeder';
+import { PatientSeeder } from './patient.seeder';
+import { OrgUserSeeder } from './org-user.seeder';
 
 export class SeederManager {
   private seeders: BaseSeeder[];
@@ -13,25 +16,28 @@ export class SeederManager {
     this.seeders = [
       new RoleSeeder(),
       new UserSeeder(),
+      new OrganizationSeeder(),
+      new PatientSeeder(),
+      new OrgUserSeeder(),
     ];
   }
 
   async runAll(): Promise<void> {
     try {
-      logger.info('🚀 Starting database seeding...');
+      logger.info('Starting database seeding...');
 
       // Test database connection
       await sequelize.authenticate();
-      logger.info('✅ Database connection established.');
+      logger.info('Database connection established.');
 
       // Run all seeders
       for (const seeder of this.seeders) {
         await seeder.run();
       }
 
-      logger.info('🎉 All seeders completed successfully!');
+      logger.info('All seeders completed successfully!');
     } catch (error) {
-      logger.error('❌ Seeding failed:', error);
+      logger.error('Seeding failed:', error);
       throw error;
     } finally {
       await sequelize.close();
@@ -40,10 +46,10 @@ export class SeederManager {
 
   async runSpecific(seederName: string): Promise<void> {
     try {
-      logger.info(`🚀 Running ${seederName} seeder...`);
+      logger.info(`Running ${seederName} seeder...`);
 
       await sequelize.authenticate();
-      logger.info('✅ Database connection established.');
+      logger.info('Database connection established.');
 
       const seeder = this.seeders.find(s => s.constructor.name === seederName);
       if (!seeder) {
@@ -51,9 +57,9 @@ export class SeederManager {
       }
 
       await seeder.run();
-      logger.info(`✅ ${seederName} completed successfully!`);
+      logger.info(`${seederName} completed successfully!`);
     } catch (error) {
-      logger.error('❌ Seeding failed:', error);
+      logger.error('Seeding failed:', error);
       throw error;
     } finally {
       await sequelize.close();

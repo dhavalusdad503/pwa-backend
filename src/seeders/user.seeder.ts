@@ -12,20 +12,20 @@ export class UserSeeder extends BaseSeeder {
 
   async run(): Promise<void> {
     try {
-      logger.info('🌱 Seeding users...');
+      logger.info('Seeding users...');
 
       if (await this.exists()) {
-        logger.warn('⚠️  Users already exist, skipping...');
+        logger.warn('Users already exist, skipping...');
         return;
       }
 
       const roles = await Role.findAll();
-      const superRole = roles.find(role => role.name === Roles.SUPER);
       const adminRole = roles.find(role => role.name === Roles.ADMIN);
-      const userRole = roles.find(role => role.name === Roles.USER);
+      const supervisorRole = roles.find(role => role.name === Roles.SUPERVISOR);
+      const caregiverRole = roles.find(role => role.name === Roles.CAREGIVER);
 
-      if(!superRole || !adminRole || !userRole) {
-        logger.error('❌ Roles not found, skipping users seeding...');
+      if(!adminRole || !supervisorRole || !caregiverRole) {
+        logger.error('Roles not found, skipping users seeding...');
         return;
       }
 
@@ -34,7 +34,7 @@ export class UserSeeder extends BaseSeeder {
           firstName: 'Admin1',
           lastName: 'Admin1',
           email: 'admin1@yopmail.com',
-          roleId: superRole?.id,
+          roleId: adminRole?.id,
           status: UserStatus.ACTIVE,
           authProvider: AuthProvider.EMAIL,
           password: await bcrypt.hash('admin@123', 10),
@@ -43,7 +43,7 @@ export class UserSeeder extends BaseSeeder {
           firstName: 'User1',
           lastName: 'User1',
           email: 'user1@yopmail.com',
-          roleId: userRole?.id,
+          roleId: caregiverRole?.id,
           status: UserStatus.ACTIVE,
           authProvider: AuthProvider.EMAIL,
           password: await bcrypt.hash('user@123', 10),
@@ -51,9 +51,9 @@ export class UserSeeder extends BaseSeeder {
       ];
 
       await User.bulkCreate(users);
-      logger.info('✅ Users seeded successfully!');
+      logger.info('Users seeded successfully!');
     } catch (error) {
-      logger.error('❌ Error seeding users:', error);
+      logger.error('Error seeding users:', error);
       throw error;
     }
   }
