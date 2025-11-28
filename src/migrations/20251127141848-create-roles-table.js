@@ -7,40 +7,29 @@ module.exports = {
    * @param {import('sequelize').Sequelize} Sequelize
    */
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable('roles', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
       },
       name: {
-        type: Sequelize.STRING(100),
-        allowNull: false
-      },
-      email: {
-        type: Sequelize.STRING(150),
         allowNull: false,
-        unique: true
+        type: Sequelize.STRING,
+        unique: true,
       },
-      password: {
-        type: Sequelize.STRING(255),
-        allowNull: false
+      slug: {
+        allowNull: false,
+        type: Sequelize.STRING,
+        unique: true,
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW
+        defaultValue: Sequelize.NOW,
       }
     });
-
-    // Add index on email for faster lookups
-    await queryInterface.addIndex('users', ['email']);
   },
 
   /**
@@ -48,6 +37,6 @@ module.exports = {
    * @param {import('sequelize').Sequelize} Sequelize
    */
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('users');
-  }
-}; 
+    await queryInterface.dropTable('roles');
+  },
+};

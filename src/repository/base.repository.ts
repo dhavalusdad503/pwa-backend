@@ -1,24 +1,28 @@
 import { Model, Transaction, FindOptions, CreateOptions, ModelStatic } from 'sequelize';
 
 export interface IBaseRepository<T extends Model> {
-  findById(id: number, options?: FindOptions): Promise<T | null>;
+  findById(id: string | number, options?: FindOptions): Promise<T | null>;
   findAll(options?: FindOptions): Promise<T[]>;
   findOne(options: FindOptions): Promise<T | null>;
   create(data: Partial<T>, options?: CreateOptions): Promise<T>;
-  update(id: number, data: Partial<T>, transaction?: Transaction): Promise<T>;
-  delete(id: number): Promise<boolean>;
+  update(id: string | number, data: Partial<T>, transaction?: Transaction): Promise<T>;
+  delete(id: string | number): Promise<boolean>;
   count(options?: FindOptions): Promise<number>;
 }
 
 export abstract class BaseRepository<T extends Model> implements IBaseRepository<T> {
 
-protected model: ModelStatic<T>;
+  protected model: ModelStatic<T>;
 
   constructor(model: ModelStatic<T>) {
     this.model = model;
   }
 
-  async findById(id: number, options?: FindOptions): Promise<T | null> {
+  async bulkCreate(data: Partial<T['_creationAttributes']>[], options?: CreateOptions): Promise<T[]> {
+    return await this.model.bulkCreate(data as T['_creationAttributes'][], options) as T[];
+  }
+
+  async findById(id: string | number, options?: FindOptions): Promise<T | null> {
     return await this.model.findByPk(id, options) as T | null;
   }
 
@@ -33,7 +37,7 @@ protected model: ModelStatic<T>;
     return await this.model.create(data, options) as T;
   }
 
-  async update(id: number, data: Partial<T>, transaction?: Transaction): Promise<T> {
+  async update(id: string | number, data: Partial<T>, transaction?: Transaction): Promise<T> {
     const instance = await this.model.findByPk(id, { transaction });
     if (!instance) {
       throw new Error(`${this.model.name} not found`);
@@ -41,7 +45,7 @@ protected model: ModelStatic<T>;
     return await instance.update(data, { transaction }) as T;
   }
 
-  async delete(id: number): Promise<boolean> {
+  async delete(id: string | number): Promise<boolean> {
     const instance = await this.model.findByPk(id);
     if (!instance) {
       return false;

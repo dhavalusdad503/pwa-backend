@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { BaseRoute } from "./routes/base.routes";
 import { sequelize } from "./database/db";
 import logger from "@utils/logger";
+import { initModels } from "./models";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ export default class App {
     this.port = Number(process.env.PORT) || 3000;
 
     this.initializeMiddlewares();
+    initModels();
     this.initializeRoutes(routes);
   }
 
