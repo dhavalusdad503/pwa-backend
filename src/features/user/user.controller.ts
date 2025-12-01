@@ -4,48 +4,48 @@ import { errorResponse, successResponse } from "../../utils/responseHandler";
 import userService from "./user.service";
 
 class UserController {
-  async createUser(req: Request, res: Response) {
-    try {
-      const { username, email, password } = req.body;
+  // async createUser(req: Request, res: Response) {
+  //   try {
+  //     const { username, email, password } = req.body;
 
-      const missingFields = [];
-      if (!username) missingFields.push("Username");
-      if (!email) missingFields.push("Email");
-      if (!password) missingFields.push("Password");
+  //     const missingFields = [];
+  //     if (!username) missingFields.push("Username");
+  //     if (!email) missingFields.push("Email");
+  //     if (!password) missingFields.push("Password");
 
-      if (missingFields.length > 0) {
-        return errorResponse(
-          res,
-          `${missingFields.join(", ")} ${
-            missingFields.length > 1 ? "are" : "is"
-          } required`,
-          400
-        );
-      }
+  //     if (missingFields.length > 0) {
+  //       return errorResponse(
+  //         res,
+  //         `${missingFields.join(", ")} ${
+  //           missingFields.length > 1 ? "are" : "is"
+  //         } required`,
+  //         400
+  //       );
+  //     }
 
-      const newUser = await userService.registerUser({
-        name: username,
-        email,
-        password
-      });
+  //     const newUser = await userService.registerUser({
+  //       name: username,
+  //       email,
+  //       password
+  //     });
 
-      return successResponse(res, newUser, "User created successfully");
-    } catch (error: any) {
-      return errorResponse(res, error.message || "Error creating user");
-    }
-  }
+  //     return successResponse(res, newUser, "User created successfully");
+  //   } catch (error: any) {
+  //     return errorResponse(res, error.message || "Error creating user");
+  //   }
+  // }
 
-  async loginUser(req: Request, res: Response) {
-    try {
-      const { email, password } = req.body;
+  // async loginUser(req: Request, res: Response) {
+  //   try {
+  //     const { email, password } = req.body;
 
-      const { user, token } = await userService.loginUser(email, password);
+  //     const { user, token } = await userService.loginUser(email, password);
 
-      return successResponse(res, { token }, "Login successful");
-    } catch (error: any) {
-      return errorResponse(res, error.message || "Error logging in user");
-    }
-  }
+  //     return successResponse(res, { token }, "Login successful");
+  //   } catch (error: any) {
+  //     return errorResponse(res, error.message || "Error logging in user");
+  //   }
+  // }
 
   async updateUser(req: Request, res: Response) {
     const transaction = await sequelize.transaction();
@@ -53,7 +53,10 @@ class UserController {
       const { name, email } = req.body;
       const { userId } = req.params;
 
-      const updatedUser = await userService.updateUser(+userId, { name, email });
+      const updatedUser = await userService.updateUser(+userId, {
+        name,
+        email,
+      });
 
       await transaction.commit();
       return successResponse(res, updatedUser, "User updated successfully");
@@ -93,7 +96,7 @@ class UserController {
 
   async test(req: Request, res: Response) {
     try {
-      return successResponse(res,null,"test successfully");
+      return successResponse(res, null, "test successfully");
     } catch (error: any) {
       return errorResponse(res, error.message || "Error fetching user");
     }

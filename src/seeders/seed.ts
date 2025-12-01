@@ -1,7 +1,7 @@
-import logger from '@utils/logger';
-import { SeederManager } from './seeder.manager';
+import logger from "@utils/logger";
+import { SeederManager } from "./seeder.manager";
 
-import { initModels } from '../models';
+import { initModels } from "../models";
 
 async function main() {
   try {
@@ -20,7 +20,7 @@ async function main() {
 
     process.exit(0);
   } catch (error) {
-    logger.error('Seeding failed:', error);
+    logger.error("Seeding failed:", error);
     process.exit(1);
   }
 }

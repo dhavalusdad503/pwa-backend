@@ -1,6 +1,15 @@
-import { Model, DataTypes, Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import {
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  Sequelize,
+} from "sequelize";
 
-class OrgUser extends Model<InferAttributes<OrgUser>, InferCreationAttributes<OrgUser>> {
+class OrgUser extends Model<
+  InferAttributes<OrgUser>,
+  InferCreationAttributes<OrgUser>
+> {
   declare userId: string;
   declare orgId: string;
 
@@ -11,27 +20,27 @@ class OrgUser extends Model<InferAttributes<OrgUser>, InferCreationAttributes<Or
           type: DataTypes.UUID,
           primaryKey: true,
           allowNull: false,
-          field: 'user_id',
+          field: "user_id",
           references: {
-            model: 'users',
-            key: 'id',
+            model: "users",
+            key: "id",
           },
-          onDelete: 'CASCADE',
+          onDelete: "CASCADE",
         },
         orgId: {
           type: DataTypes.UUID,
           allowNull: false,
-          field: 'org_id',
+          field: "org_id",
           references: {
-            model: 'organizations',
-            key: 'id',
+            model: "organizations",
+            key: "id",
           },
-          onDelete: 'CASCADE',
+          onDelete: "CASCADE",
         },
       },
       {
         sequelize,
-        tableName: 'org_users',
+        tableName: "org_users",
         timestamps: false,
         underscored: true,
       }
@@ -41,8 +50,11 @@ class OrgUser extends Model<InferAttributes<OrgUser>, InferCreationAttributes<Or
   }
 
   public static associate(models: any): void {
-    OrgUser.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
-    OrgUser.belongsTo(models.Organization, { foreignKey: 'orgId', as: 'organization' });
+    OrgUser.belongsTo(models.User, { foreignKey: "userId", as: "user" });
+    OrgUser.belongsTo(models.Organization, {
+      foreignKey: "orgId",
+      as: "organization",
+    });
   }
 }
 

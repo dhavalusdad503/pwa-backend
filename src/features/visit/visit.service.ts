@@ -1,6 +1,6 @@
-import Visit from '../../models/visit.model';
-import VisitRepository from './visit.repository';
-import { CreateVisitDto, UpdateVisitDto } from './visit.dto';
+import Visit from "../../models/visit.model";
+import { CreateVisitDto, UpdateVisitDto } from "./visit.dto";
+import VisitRepository from "./visit.repository";
 
 class VisitService {
   private visitRepository: typeof VisitRepository;

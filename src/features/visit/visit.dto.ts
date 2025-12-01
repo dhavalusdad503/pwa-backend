@@ -1,5 +1,5 @@
-import Joi from 'joi';
-import { joiCommon } from '@helper/joi-schema.helper';
+import { joiCommon } from "@helper/joi-schema.helper";
+import Joi from "joi";
 
 export const createVisitSchema = Joi.object({
   orgId: joiCommon.joiString.uuid().required(),

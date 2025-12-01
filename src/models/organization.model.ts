@@ -1,6 +1,16 @@
-import { Model, DataTypes, Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import {
+  CreationOptional,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  Sequelize,
+} from "sequelize";
 
-class Organization extends Model<InferAttributes<Organization>, InferCreationAttributes<Organization>> {
+class Organization extends Model<
+  InferAttributes<Organization>,
+  InferCreationAttributes<Organization>
+> {
   declare id: CreationOptional<string>;
   declare name: string;
   declare createdAt: CreationOptional<Date>;
@@ -23,18 +33,18 @@ class Organization extends Model<InferAttributes<Organization>, InferCreationAtt
           type: DataTypes.DATE,
           defaultValue: DataTypes.NOW,
           allowNull: false,
-          field: 'created_at',
+          field: "created_at",
         },
         updatedAt: {
           type: DataTypes.DATE,
           defaultValue: DataTypes.NOW,
           allowNull: false,
-          field: 'updated_at',
+          field: "updated_at",
         },
       },
       {
         sequelize,
-        tableName: 'organizations',
+        tableName: "organizations",
         timestamps: true,
         underscored: true,
       }

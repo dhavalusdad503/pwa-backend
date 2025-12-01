@@ -16,7 +16,8 @@ class AuthController {
       if (missingFields.length > 0) {
         return errorResponse(
           res,
-          `${missingFields.join(", ")} ${missingFields.length > 1 ? "are" : "is"
+          `${missingFields.join(", ")} ${
+            missingFields.length > 1 ? "are" : "is"
           } required`,
           400
         );
@@ -27,7 +28,7 @@ class AuthController {
         lastName,
         email,
         password,
-        phone
+        phone,
       });
 
       return successResponse(res, newUser, "User registered successfully");

@@ -1,6 +1,16 @@
-import { Model, DataTypes, Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import {
+  CreationOptional,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  Sequelize,
+} from "sequelize";
 
-class Visit extends Model<InferAttributes<Visit>, InferCreationAttributes<Visit>> {
+class Visit extends Model<
+  InferAttributes<Visit>,
+  InferCreationAttributes<Visit>
+> {
   declare id: CreationOptional<string>;
   declare orgId: string;
   declare caregiverId: string;
@@ -25,52 +35,52 @@ class Visit extends Model<InferAttributes<Visit>, InferCreationAttributes<Visit>
         orgId: {
           type: DataTypes.UUID,
           allowNull: false,
-          field: 'org_id',
+          field: "org_id",
           references: {
-            model: 'organizations',
-            key: 'id',
+            model: "organizations",
+            key: "id",
           },
-          onDelete: 'CASCADE',
+          onDelete: "CASCADE",
         },
         caregiverId: {
           type: DataTypes.UUID,
           allowNull: false,
-          field: 'caregiver_id',
+          field: "caregiver_id",
           references: {
-            model: 'users',
-            key: 'id',
+            model: "users",
+            key: "id",
           },
-          onDelete: 'CASCADE',
+          onDelete: "CASCADE",
         },
         patientId: {
           type: DataTypes.UUID,
           allowNull: false,
-          field: 'patient_id',
+          field: "patient_id",
           references: {
-            model: 'patients',
-            key: 'id',
+            model: "patients",
+            key: "id",
           },
-          onDelete: 'CASCADE',
+          onDelete: "CASCADE",
         },
         startedAt: {
           type: DataTypes.DATE,
           allowNull: true,
-          field: 'started_at',
+          field: "started_at",
         },
         endedAt: {
           type: DataTypes.DATE,
           allowNull: true,
-          field: 'ended_at',
+          field: "ended_at",
         },
         submittedAt: {
           type: DataTypes.DATE,
           allowNull: true,
-          field: 'submitted_at',
+          field: "submitted_at",
         },
         serviceType: {
           type: DataTypes.STRING,
           allowNull: true,
-          field: 'service_type',
+          field: "service_type",
         },
         notes: {
           type: DataTypes.TEXT,
@@ -80,18 +90,18 @@ class Visit extends Model<InferAttributes<Visit>, InferCreationAttributes<Visit>
           type: DataTypes.DATE,
           defaultValue: DataTypes.NOW,
           allowNull: false,
-          field: 'created_at',
+          field: "created_at",
         },
         updatedAt: {
           type: DataTypes.DATE,
           defaultValue: DataTypes.NOW,
           allowNull: false,
-          field: 'updated_at',
+          field: "updated_at",
         },
       },
       {
         sequelize,
-        tableName: 'visits',
+        tableName: "visits",
         timestamps: true,
         underscored: true,
       }
@@ -101,9 +111,15 @@ class Visit extends Model<InferAttributes<Visit>, InferCreationAttributes<Visit>
   }
 
   public static associate(models: any): void {
-    Visit.belongsTo(models.Organization, { foreignKey: 'orgId', as: 'organization' });
-    Visit.belongsTo(models.User, { foreignKey: 'caregiverId', as: 'caregiver' });
-    Visit.belongsTo(models.Patient, { foreignKey: 'patientId', as: 'patient' });
+    Visit.belongsTo(models.Organization, {
+      foreignKey: "orgId",
+      as: "organization",
+    });
+    Visit.belongsTo(models.User, {
+      foreignKey: "caregiverId",
+      as: "caregiver",
+    });
+    Visit.belongsTo(models.Patient, { foreignKey: "patientId", as: "patient" });
   }
 }
 
