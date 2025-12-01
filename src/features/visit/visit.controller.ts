@@ -1,10 +1,11 @@
+import { AuthRequest } from "@middlewares/auth.middleware";
 import logger from "@utils/logger";
 import { successResponse } from "@utils/responseHandler";
 import { Request, Response } from "express";
 import visitService from "./visit.service";
 
 class VisitController {
-  async create(req: Request, res: Response): Promise<Response> {
+  async create(req: AuthRequest, res: Response): Promise<Response> {
     try {
       const visit = await visitService.createVisit({
         ...req.body,
