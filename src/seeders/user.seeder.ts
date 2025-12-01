@@ -1,11 +1,10 @@
-import bcrypt from 'bcrypt';
-import logger from '@utils/logger';
-import { AuthProvider, Roles, UserStatus } from '@enums';
-import { UserRepository } from '@features/user';
-import { RoleRepository } from '@features/roles';
+import { AuthProvider, Roles, UserStatus } from "@enums";
+import { RoleRepository } from "@features/roles";
+import { UserRepository } from "@features/user";
+import logger from "@utils/logger";
+import bcrypt from "bcrypt";
 
 export class UserSeeder {
-
   private userRepository: typeof UserRepository;
   private roleRepository: typeof RoleRepository;
 
@@ -19,17 +18,19 @@ export class UserSeeder {
       logger.info("Seeding users...");
 
       if (await this.userRepository.dataExists()) {
-        logger.warn('Users already exist, skipping...');
+        logger.warn("Users already exist, skipping...");
         return;
       }
 
       const roles = await this.roleRepository.findAll();
-      const adminRole = roles.find(role => role.name === Roles.ADMIN);
-      const supervisorRole = roles.find(role => role.name === Roles.SUPERVISOR);
-      const caregiverRole = roles.find(role => role.name === Roles.CAREGIVER);
+      const adminRole = roles.find((role) => role.name === Roles.ADMIN);
+      const supervisorRole = roles.find(
+        (role) => role.name === Roles.SUPERVISOR
+      );
+      const caregiverRole = roles.find((role) => role.name === Roles.CAREGIVER);
 
       if (!adminRole || !supervisorRole || !caregiverRole) {
-        logger.error('Roles not found, skipping users seeding...');
+        logger.error("Roles not found, skipping users seeding...");
         return;
       }
 
@@ -64,7 +65,7 @@ export class UserSeeder {
       ];
 
       await this.userRepository.bulkCreate(users);
-      logger.info('Users seeded successfully!');
+      logger.info("Users seeded successfully!");
     } catch (error) {
       logger.error("Error seeding users:", error);
       throw error;

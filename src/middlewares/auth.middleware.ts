@@ -1,9 +1,9 @@
-import { errorResponse } from "@utils/responseHandler";
-import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-import { verifyJWTToken as verifyToken } from "@utils/jwt";
 import { extractErrorInfo } from "@helper";
+import { verifyJWTToken as verifyToken } from "@utils/jwt";
 import logger from "@utils/logger";
+import { errorResponse } from "@utils/responseHandler";
+import { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 
 const SECRET_KEY = process.env.JWT_SECRET || "secret";
 

@@ -1,21 +1,23 @@
-import { basename, join } from 'path';
-import winston from 'winston';
-import WinstonDaily from 'winston-daily-rotate-file';
 import dotenv from "dotenv";
+import { basename, join } from "path";
+import winston from "winston";
+import WinstonDaily from "winston-daily-rotate-file";
 
-dotenv.config()
+dotenv.config();
 
 class Logger {
   private logger: winston.Logger;
 
   constructor() {
-    const logDir = join(process.cwd(), process.env.LOG_DIR || 'logs');
+    const logDir = join(process.cwd(), process.env.LOG_DIR || "logs");
 
     const fileLogFormat = winston.format.combine(
-      winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-      winston.format.label({ label: basename(__filename || 'server') }),
-      winston.format.metadata({ fillExcept: ['message', 'level', 'timestamp', 'label'] }),
-      winston.format.json(),
+      winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+      winston.format.label({ label: basename(__filename || "server") }),
+      winston.format.metadata({
+        fillExcept: ["message", "level", "timestamp", "label"],
+      }),
+      winston.format.json()
     );
 
     const consoleLogFormat = winston.format.combine(
@@ -24,27 +26,27 @@ class Logger {
       winston.format.printf((info) => {
         const { timestamp, level, message, label } = info;
         return `${timestamp} ${level} [${label}]: ${message}`;
-      }),
+      })
     );
 
     this.logger = winston.createLogger({
       format: fileLogFormat,
       transports: [
         new WinstonDaily({
-          level: 'debug',
-          datePattern: 'YYYY-MM-DD',
+          level: "debug",
+          datePattern: "YYYY-MM-DD",
           dirname: `${logDir}/debug`,
-          filename: '%DATE%.log',
-          maxFiles: '30d',
+          filename: "%DATE%.log",
+          maxFiles: "30d",
           json: false,
           zippedArchive: true,
         }),
         new WinstonDaily({
-          level: 'error',
-          datePattern: 'YYYY-MM-DD',
+          level: "error",
+          datePattern: "YYYY-MM-DD",
           dirname: `${logDir}/error`,
-          filename: '%DATE%.log',
-          maxFiles: '30d',
+          filename: "%DATE%.log",
+          maxFiles: "30d",
           handleExceptions: true,
           json: false,
           zippedArchive: true,

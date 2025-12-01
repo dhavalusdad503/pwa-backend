@@ -1,18 +1,16 @@
-import bcrypt from "bcrypt";
 import User from "../../models/user.model";
 import userRepository from "./user.repository";
-import { createJWTToken } from "@utils/jwt";
 
 export interface IUserService {
-  registerUser(userData: {
-    name: string;
-    email: string;
-    password: string;
-  }): Promise<User>;
-  loginUser(
-    email: string,
-    password: string
-  ): Promise<{ user: User; token: string }>;
+  // registerUser(userData: {
+  //   name: string;
+  //   email: string;
+  //   password: string;
+  // }): Promise<User>;
+  // loginUser(
+  //   email: string,
+  //   password: string
+  // ): Promise<{ user: User; token: string }>;
   updateUser(
     id: number,
     userData: { name?: string; email?: string }
@@ -22,49 +20,43 @@ export interface IUserService {
 }
 
 class UserService implements IUserService {
-  async registerUser(userData: {
-    name: string;
-    email: string;
-    password: string;
-  }): Promise<User> {
-    const existingUser = await userRepository.findByEmail(userData.email);
-    if (existingUser) {
-      throw new Error("Email is already in use");
-    }
+  // async registerUser(userData: {
+  //   name: string;
+  //   email: string;
+  //   password: string;
+  // }): Promise<User> {
+  //   const existingUser = await userRepository.findByEmail(userData.email);
+  //   if (existingUser) {
+  //     throw new Error("Email is already in use");
+  //   }
 
-    const hashedPassword = await bcrypt.hash(userData.password, 10);
+  //   const hashedPassword = await bcrypt.hash(userData.password, 10);
 
-    return await userRepository.create({
-      firstName: userData.name,
-      email: userData.email,
-      password: hashedPassword,
-    });
-  }
+  //   return await userRepository.create({
+  //     name: userData.name,
+  //     email: userData.email,
+  //     password: hashedPassword,
+  //   } as User);
+  // }
 
-  async loginUser(
-    email: string,
-    password: string
-  ): Promise<{ user: User; token: string }> {
-    const user = await userRepository.findByEmail(email);
+  // async loginUser(
+  //   email: string,
+  //   password: string
+  // ): Promise<{ user: User; token: string }> {
+  //   const user = await userRepository.findByEmail(email);
+  //   if (!user) {
+  //     throw new Error("Invalid email or password");
+  //   }
 
-    if (!user) {
-      throw new Error("Invalid email or password");
-    }
+  //   const isPasswordValid = await user.comparePassword(password);
+  //   if (!isPasswordValid) {
+  //     throw new Error("Invalid email or password");
+  //   }
 
-    const isPasswordValid = await user.comparePassword(password);
-    if (!isPasswordValid) {
-      throw new Error("Invalid email or password");
-    }
+  //   const token = user.generateToken();
 
-    const AuthTokenPayload = {
-      id: user?.id,
-      email,
-      role_id: user?.roleId,
-    };
-    const token = createJWTToken(AuthTokenPayload);
-
-    return { user, token };
-  }
+  //   return { user, token };
+  // }
 
   async updateUser(
     id: number,

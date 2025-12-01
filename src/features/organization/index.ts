@@ -1,1 +1,1 @@
-export { default as OrganizationRepository } from './organization.repository';
+export { default as OrganizationRepository } from "./organization.repository";

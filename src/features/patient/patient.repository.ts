@@ -1,17 +1,24 @@
-import { Transaction } from 'sequelize';
-import Patient from '../../models/patient.model';
-import { BaseRepository } from '../../repository/base.repository';
+import { Transaction } from "sequelize";
+import Patient from "../../models/patient.model";
+import { BaseRepository } from "../../repository/base.repository";
 
 export interface IPatientRepository {
   findById(id: string): Promise<Patient | null>;
   create(data: Partial<Patient>): Promise<Patient>;
-  update(id: string, data: Partial<Patient>, transaction?: Transaction): Promise<Patient>;
+  update(
+    id: string,
+    data: Partial<Patient>,
+    transaction?: Transaction
+  ): Promise<Patient>;
   delete(id: string): Promise<boolean>;
   findAll(): Promise<Patient[]>;
   count(): Promise<number>;
 }
 
-class PatientRepository extends BaseRepository<Patient> implements IPatientRepository {
+class PatientRepository
+  extends BaseRepository<Patient>
+  implements IPatientRepository
+{
   constructor() {
     super(Patient);
   }

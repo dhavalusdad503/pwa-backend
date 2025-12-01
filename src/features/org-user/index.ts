@@ -1,1 +1,1 @@
-export { default as OrgUserRepository } from './org-user.repository';
+export { default as OrgUserRepository } from "./org-user.repository";

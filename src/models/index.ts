@@ -1,10 +1,10 @@
-import { sequelize } from '../database/db';
-import Role from './roles.model';
-import User from './user.model';
-import Organization from './organization.model';
-import OrgUser from './org-user.model';
-import Patient from './patient.model';
-import Visit from './visit.model';
+import { sequelize } from "../database/db";
+import OrgUser from "./org-user.model";
+import Organization from "./organization.model";
+import Patient from "./patient.model";
+import Role from "./roles.model";
+import User from "./user.model";
+import Visit from "./visit.model";
 
 export const initModels = () => {
   // Initialize models
@@ -33,4 +33,4 @@ export const initModels = () => {
   Visit.associate(models);
 };
 
-export { Role, User, Organization, OrgUser, Patient, Visit };
+export { Organization, OrgUser, Patient, Role, User, Visit };

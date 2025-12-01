@@ -23,4 +23,4 @@ export interface UserResponseDto {
 export interface LoginResponseDto {
   token: string;
   user: UserResponseDto;
-} 
+}

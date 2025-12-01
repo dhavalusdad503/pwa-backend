@@ -1,10 +1,10 @@
 import {
-  Model,
+  CreationOptional,
   DataTypes,
-  Sequelize,
   InferAttributes,
   InferCreationAttributes,
-  CreationOptional,
+  Model,
+  Sequelize,
 } from "sequelize";
 
 class Visit extends Model<

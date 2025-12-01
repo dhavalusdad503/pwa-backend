@@ -1,9 +1,9 @@
 import {
-  Model,
-  Transaction,
-  FindOptions,
   CreateOptions,
+  FindOptions,
+  Model,
   ModelStatic,
+  Transaction,
 } from "sequelize";
 
 export interface IBaseRepository<T extends Model> {

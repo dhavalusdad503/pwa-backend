@@ -1,9 +1,7 @@
-import visitController from "./visit.controller";
-import { BaseRoute } from "@routes/base.routes";
 import { asyncHandler } from "@helper";
-import { validationMiddleware } from "@utils/validationMiddleware";
-import { createVisitSchema, updateVisitSchema } from "./visit.dto";
 import { verifyJWTToken } from "@middlewares/auth.middleware";
+import { BaseRoute } from "@routes/base.routes";
+import visitController from "./visit.controller";
 
 export default class VisitRoute extends BaseRoute {
   constructor() {

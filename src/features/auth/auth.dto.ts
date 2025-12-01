@@ -1,4 +1,4 @@
-import { AuthProvider, Roles } from "@enums";
+import { AuthProvider } from "@enums";
 import { joiCommon } from "@helper/joi-schema.helper";
 import Joi from "joi";
 
@@ -30,17 +30,4 @@ export interface RegisterDto {
 export interface LoginDto {
   email: string;
   password: string;
-}
-
-export interface ResponseLoginData {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  authProvider: string;
-  role: {
-    name: string;
-    slug: string;
-    id: string;
-  };
 }
