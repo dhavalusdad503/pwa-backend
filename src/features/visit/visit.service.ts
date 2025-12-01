@@ -22,8 +22,8 @@ class VisitService {
     return await this.visitRepository.create(CreateVisitData);
   }
 
-  async getAllVisits(): Promise<Visit[]> {
-    return await this.visitRepository.findAll();
+  async getAllVisits(id: string | number): Promise<Visit[]> {
+    return await this.visitRepository.findAll({ where: { caregiverId: id } });
   }
 
   async getVisitById(id: string): Promise<Visit | null> {

@@ -18,10 +18,11 @@ class VisitController {
     }
   }
 
-  async getAll(req: Request, res: Response): Promise<Response> {
+  async getAll(req: AuthRequest, res: Response): Promise<Response> {
     try {
-      const visits = await visitService.getAllVisits();
-      return res.status(200).json(visits);
+      const { id } = req.user;
+      const visits = await visitService.getAllVisits(id);
+      return successResponse(res, visits, "Visit fetch successfully");
     } catch (error) {
       logger.error("Error fetching visits:", error);
       return res.status(500).json({ message: "Internal server error" });
