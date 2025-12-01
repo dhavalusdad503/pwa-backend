@@ -32,12 +32,12 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     return bcrypt.compare(password, this.password);
   }
 
-  public generateToken(): string {
-    const payload = { id: this.id, email: this.email };
-    return jwt.sign(payload, process.env.JWT_SECRET || "secret", {
-      expiresIn: "24h",
-    });
-  }
+  // public generateToken(): string {
+  //   const payload = { id: this.id, email: this.email };
+  //   return jwt.sign(payload, process.env.JWT_SECRET || "secret", {
+  //     expiresIn: "24h",
+  //   });
+  // }
 
   public static USER_FIRST_NAME_MAX_LENGTH = 100;
   public static USER_LAST_NAME_MAX_LENGTH = 100;

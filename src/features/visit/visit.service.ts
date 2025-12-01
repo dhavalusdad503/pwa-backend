@@ -1,6 +1,7 @@
-import Visit from '../../models/visit.model';
-import VisitRepository from './visit.repository';
-import { CreateVisitDto, UpdateVisitDto } from './visit.dto';
+import Visit from "../../models/visit.model";
+import VisitRepository from "./visit.repository";
+import { CreateVisitDto, UpdateVisitDto } from "./visit.dto";
+import { child } from "winston";
 
 class VisitService {
   private visitRepository: typeof VisitRepository;
@@ -10,7 +11,16 @@ class VisitService {
   }
 
   async createVisit(visitData: CreateVisitDto): Promise<Visit> {
-    return await this.visitRepository.create(visitData as any);
+    const CreateVisitData = {
+      caregiverId: visitData.id,
+      notes: visitData.notes,
+      serviceType: visitData?.serviceType.value,
+      patientId: visitData.PatientId,
+      startedAt: visitData.start_time,
+      endedAt: visitData.end_time,
+      orgId: visitData.OrgId,
+    };
+    return await this.visitRepository.create(CreateVisitData);
   }
 
   async getAllVisits(): Promise<Visit[]> {

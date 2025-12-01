@@ -5,6 +5,7 @@ import { LoginDto, RegisterDto, ResponseLoginData } from "./auth.dto";
 import Role from "../../models/roles.model";
 import { Roles } from "@enums";
 import roleRepository from "@repository/role.repository";
+import { createJWTToken } from "@utils/jwt";
 
 export interface IAuthService {
   register(data: RegisterDto): Promise<User>;
@@ -61,14 +62,18 @@ class AuthService implements IAuthService {
       role: {
         name,
         slug,
-        roleId,
+        id: roleId,
       },
     };
-
-    const token = user.generateToken();
+    const AuthTokenPayload = {
+      id,
+      email,
+      role_id: userData.role.id,
+    };
+    const token = createJWTToken(AuthTokenPayload);
 
     return { user: userData, token };
-  }
+  } 
 }
 
 export default new AuthService();
