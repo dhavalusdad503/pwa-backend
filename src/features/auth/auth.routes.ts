@@ -2,7 +2,7 @@ import { validationMiddleware } from "@utils/validationMiddleware";
 import { asyncHandler } from "../../helper/async-handler.helper";
 import { BaseRoute } from "../../routes/base.routes";
 import authController from "./auth.controller";
-import { loginSchema, registerSchema } from "./auth.dto";
+import { loginSchema, refreshTokenSchema, registerSchema } from "./auth.dto";
 
 export default class AuthRoute extends BaseRoute {
   constructor() {
@@ -19,6 +19,11 @@ export default class AuthRoute extends BaseRoute {
       "/login",
       validationMiddleware(loginSchema),
       asyncHandler(authController.login)
+    );
+    this.router.post(
+      "/refresh",
+      validationMiddleware(refreshTokenSchema, "body"),
+      asyncHandler(authController.refreshToken)
     );
   }
 }

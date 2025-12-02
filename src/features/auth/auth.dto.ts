@@ -19,6 +19,10 @@ export const loginSchema = Joi.object({
   is_remember_me: joiCommon.joiBoolean.optional(),
 });
 
+export const refreshTokenSchema = Joi.object({
+  refreshToken: joiCommon.joiString.required(),
+});
+
 export interface RegisterDto {
   firstName: string;
   lastName: string;

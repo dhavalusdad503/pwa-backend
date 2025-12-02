@@ -1,5 +1,5 @@
 import { Roles } from "@enums";
-import { createJWTToken } from "@utils/jwt";
+import { createJWTRefreshToken, createJWTToken } from "@utils/jwt";
 import bcrypt from "bcrypt";
 import Role from "../../models/roles.model";
 import User from "../../models/user.model";
@@ -33,7 +33,9 @@ class AuthService implements IAuthService {
     } as User);
   }
 
-  async login(data: LoginDto): Promise<{ user: User; token: string }> {
+  async login(
+    data: LoginDto
+  ): Promise<{ user: User; token: string; refreshToken: string }> {
     const user = await userRepository.findByEmailWithRole(data.email);
     if (!user) {
       throw new Error("Invalid email or password");
@@ -45,11 +47,11 @@ class AuthService implements IAuthService {
     const AuthTokenPayload = {
       id: user.id,
       email: user.email,
-      role_id: user.roleId,
     };
     const token = createJWTToken(AuthTokenPayload);
+    const refreshToken = createJWTRefreshToken(AuthTokenPayload);
 
-    return { user, token };
+    return { user, token, refreshToken };
   }
 }
 
