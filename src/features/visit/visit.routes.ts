@@ -2,6 +2,8 @@ import { asyncHandler } from "@helper";
 import { verifyJWTToken } from "@middlewares/auth.middleware";
 import { BaseRoute } from "@routes/base.routes";
 import visitController from "./visit.controller";
+import { validationMiddleware } from "@utils/validationMiddleware";
+import { createVisitSchema } from "@features/visit/visit.dto";
 
 export default class VisitRoute extends BaseRoute {
   constructor() {
@@ -18,7 +20,7 @@ export default class VisitRoute extends BaseRoute {
       asyncHandler(visitController.create)
     );
     this.router.get(
-      "/get-visit-list",
+      "/",
       verifyJWTToken,
       asyncHandler(visitController.getAll)
     );

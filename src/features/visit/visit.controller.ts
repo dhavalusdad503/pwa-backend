@@ -11,7 +11,11 @@ class VisitController {
         ...req.body,
         ...req.user,
       });
-      return successResponse(res, visit, "Visit created successfully");
+      const data = {
+       id: visit.id,
+       
+      }
+      return successResponse(res, data, "Visit created successfully");
     } catch (error) {
       logger.error("Error creating visit:", error);
       return res.status(500).json({ message: "Internal server error" });

@@ -1,7 +1,7 @@
 import { OrgRepository } from "@features/organization";
 import { PatientRepository } from "@features/patient";
 import { extractErrorMessage } from "@helper";
-import { sequelize } from "@models";
+import { Patient, sequelize } from "@models"; 
 import Visit from "../../models/visit.model";
 import { CreateVisitDto, UpdateVisitDto } from "./visit.dto";
 import VisitRepository from "./visit.repository";
@@ -17,20 +17,21 @@ class VisitService {
     this.orgRepository = OrgRepository;
   }
 
-  async createVisit(visitData: CreateVisitDto): Promise<void> {
+  async createVisit(visitData: CreateVisitDto): Promise<{id:string}> {
     let createVisitData = {
       caregiverId: visitData.id,
       notes: visitData.notes,
-      serviceType: visitData?.serviceType.value,
-      patientId: "",
-      startedAt: visitData.start_time,
-      endedAt: visitData.end_time,
+      serviceType: visitData?.serviceType,
+      patientId: "", 
+      startedAt: visitData.startedAt,
+      endedAt: visitData.endedAt,
+      submittedAt: visitData.submittedAt,
       orgId: "",
     };
     const transaction = await sequelize.transaction();
     try {
       const organization = await this.orgRepository.findOne({
-        where: { name: visitData.OrgName },
+        where: { name: visitData.orgName },
       });
 
       createVisitData.orgId = organization?.id || " ";
@@ -51,8 +52,9 @@ class VisitService {
         createVisitData.patientId = findPatient?.id;
       }
 
-      await this.visitRepository.create(createVisitData, { transaction });
+      const visit = await this.visitRepository.create(createVisitData, { transaction });
       transaction.commit();
+      return {id: visit?.id};
     } catch (error) {
       await transaction.rollback();
       throw new Error(extractErrorMessage(error, "Error in creating Visit"));
@@ -60,7 +62,16 @@ class VisitService {
   }
 
   async getAllVisits(id: string | number): Promise<Visit[]> {
-    return await this.visitRepository.findAll({ where: { caregiverId: id } });
+    return await this.visitRepository.findAll({ 
+        attributes: { exclude: ['orgId', 'patientId','updatedAt'] } ,
+        where: { caregiverId: id },
+        include: [
+            {
+              model: Patient,
+              as: "patient",
+            }
+        ],
+     });
   }
 
   async getVisitById(id: string): Promise<Visit | null> {
