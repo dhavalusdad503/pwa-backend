@@ -1,16 +1,15 @@
-import {
-  Model,
-  DataTypes,
-  Sequelize,
-  Optional,
-  InferAttributes,
-  InferCreationAttributes,
-  CreationOptional,
-} from 'sequelize';
+import { AuthProvider, UserStatus } from "@enums";
+import Role from "@models/roles.model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { AuthProvider, UserStatus } from '@enums';
-
+import {
+  CreationOptional,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  Sequelize,
+} from "sequelize";
 
 // // User Model Class
 // class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
@@ -25,6 +24,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare password: CreationOptional<string>;
   declare authProvider: string;
   declare status: string;
+  declare role?: Role;
   declare readonly createdAt: CreationOptional<Date>;
   declare readonly updatedAt: CreationOptional<Date>;
 
@@ -32,12 +32,12 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     return bcrypt.compare(password, this.password);
   }
 
-  public generateToken(): string {
-    const payload = { id: this.id, email: this.email };
-    return jwt.sign(payload, process.env.JWT_SECRET || "secret", {
-      expiresIn: "24h",
-    });
-  }
+  // public generateToken(): string {
+  //   const payload = { id: this.id, email: this.email };
+  //   return jwt.sign(payload, process.env.JWT_SECRET || "secret", {
+  //     expiresIn: "24h",
+  //   });
+  // }
 
   public static USER_FIRST_NAME_MAX_LENGTH = 100;
   public static USER_LAST_NAME_MAX_LENGTH = 100;
@@ -57,12 +57,12 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
         firstName: {
           type: DataTypes.STRING(this.USER_FIRST_NAME_MAX_LENGTH),
           allowNull: false,
-          field: 'first_name',
+          field: "first_name",
         },
         lastName: {
           type: DataTypes.STRING(this.USER_LAST_NAME_MAX_LENGTH),
           allowNull: false,
-          field: 'last_name',
+          field: "last_name",
         },
         email: {
           type: DataTypes.STRING(this.USER_EMAIL_MAX_LENGTH),
@@ -79,17 +79,17 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
         password: {
           type: DataTypes.STRING(this.USER_PASSWORD_MAX_LENGTH),
           allowNull: false,
-          field: 'password',
+          field: "password",
         },
         roleId: {
           type: DataTypes.UUID,
           allowNull: false,
-          field: 'role_id',
+          field: "role_id",
           references: {
-            model: 'roles',
-            key: 'id',
+            model: "roles",
+            key: "id",
           },
-          onDelete: 'RESTRICT',
+          onDelete: "RESTRICT",
         },
         status: {
           type: DataTypes.ENUM(UserStatus.ACTIVE, UserStatus.INACTIVE),
@@ -97,7 +97,13 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
           allowNull: false,
         },
         authProvider: {
-          type: DataTypes.ENUM(AuthProvider.EMAIL, AuthProvider.GOOGLE, AuthProvider.FACEBOOK, AuthProvider.GITHUB, AuthProvider.TWITTER),
+          type: DataTypes.ENUM(
+            AuthProvider.EMAIL,
+            AuthProvider.GOOGLE,
+            AuthProvider.FACEBOOK,
+            AuthProvider.GITHUB,
+            AuthProvider.TWITTER
+          ),
           defaultValue: AuthProvider.EMAIL,
           allowNull: false,
         },
@@ -105,42 +111,39 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
           type: DataTypes.DATE,
           defaultValue: DataTypes.NOW,
           allowNull: false,
-          field: 'created_at',
+          field: "created_at",
         },
         updatedAt: {
           type: DataTypes.DATE,
           defaultValue: DataTypes.NOW,
           allowNull: false,
-          field: 'updated_at',
+          field: "updated_at",
         },
       },
       {
         sequelize,
-        tableName: 'users',
+        tableName: "users",
         timestamps: true,
         underscored: true,
         indexes: [
           {
             unique: true,
-            fields: ['email'],
+            fields: ["email"],
           },
         ],
       }
     );
 
     return User;
-
   }
 
   // Associations
   public static associate(models: any): void {
     User.belongsTo(models.Role, {
-      foreignKey: 'roleId',
-      as: 'role',
+      foreignKey: "roleId",
+      as: "role",
     });
   }
-
 }
 
 export default User;
-

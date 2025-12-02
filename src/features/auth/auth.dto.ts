@@ -1,4 +1,4 @@
-import { AuthProvider, Roles } from "@enums";
+import { AuthProvider } from "@enums";
 import { joiCommon } from "@helper/joi-schema.helper";
 import Joi from "joi";
 
@@ -19,6 +19,10 @@ export const loginSchema = Joi.object({
   is_remember_me: joiCommon.joiBoolean.optional(),
 });
 
+export const refreshTokenSchema = Joi.object({
+  refreshToken: joiCommon.joiString.required(),
+});
+
 export interface RegisterDto {
   firstName: string;
   lastName: string;
@@ -30,17 +34,4 @@ export interface RegisterDto {
 export interface LoginDto {
   email: string;
   password: string;
-}
-
-export interface ResponseLoginData {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  authProvider: string;
-  role: {
-    name: string;
-    slug: string;
-    id: string;
-  };
 }

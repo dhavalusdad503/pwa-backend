@@ -1,14 +1,14 @@
+import { Roles } from "@enums";
+import { createJWTRefreshToken, createJWTToken } from "@utils/jwt";
 import bcrypt from "bcrypt";
+import Role from "../../models/roles.model";
 import User from "../../models/user.model";
 import userRepository from "../user/user.repository";
-import { LoginDto, RegisterDto, ResponseLoginData } from "./auth.dto";
-import Role from "../../models/roles.model";
-import { Roles } from "@enums";
-import roleRepository from "@repository/role.repository";
+import { LoginDto, RegisterDto } from "./auth.dto";
 
 export interface IAuthService {
   register(data: RegisterDto): Promise<User>;
-  login(data: LoginDto): Promise<{ user: ResponseLoginData; token: string }>;
+  login(data: LoginDto): Promise<{ user: User; token: string }>;
 }
 
 class AuthService implements IAuthService {
@@ -35,39 +35,23 @@ class AuthService implements IAuthService {
 
   async login(
     data: LoginDto
-  ): Promise<{ user: ResponseLoginData; token: string }> {
-    const user = await userRepository.findByEmail(data.email);
+  ): Promise<{ user: User; token: string; refreshToken: string }> {
+    const user = await userRepository.findByEmailWithRole(data.email);
     if (!user) {
       throw new Error("Invalid email or password");
     }
-    const { roleId, firstName, lastName, email, authProvider, id } = user;
-
-    const role = await roleRepository.findById(roleId);
-
-    const { name, slug } = role;
-
-    const a = role?.dataValues.slug;
-
     const isPasswordValid = await user.comparePassword(data.password);
     if (!isPasswordValid) {
       throw new Error("Invalid email or password");
     }
-    const userData = {
-      firstName,
-      lastName,
-      email,
-      authProvider,
-      id,
-      role: {
-        name,
-        slug,
-        roleId,
-      },
+    const AuthTokenPayload = {
+      id: user.id,
+      email: user.email,
     };
+    const token = createJWTToken(AuthTokenPayload);
+    const refreshToken = createJWTRefreshToken(AuthTokenPayload);
 
-    const token = user.generateToken();
-
-    return { user: userData, token };
+    return { user, token, refreshToken };
   }
 }
 

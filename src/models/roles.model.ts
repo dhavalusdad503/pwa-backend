@@ -1,4 +1,11 @@
-import { Model, DataTypes, Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import {
+  CreationOptional,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  Sequelize,
+} from "sequelize";
 
 // Role Model Class
 class Role extends Model<InferAttributes<Role>, InferCreationAttributes<Role>> {
@@ -30,17 +37,17 @@ class Role extends Model<InferAttributes<Role>, InferCreationAttributes<Role>> {
           type: DataTypes.DATE,
           defaultValue: DataTypes.NOW,
           allowNull: false,
-          field: 'created_at',
+          field: "created_at",
         },
       },
       {
         sequelize,
-        tableName: 'roles',
+        tableName: "roles",
         timestamps: false,
         indexes: [
           {
             unique: true,
-            fields: ['name'],
+            fields: ["name"],
           },
         ],
       }
@@ -52,8 +59,8 @@ class Role extends Model<InferAttributes<Role>, InferCreationAttributes<Role>> {
   // Associations
   public static associate(models: any): void {
     Role.hasMany(models.User, {
-      foreignKey: 'roleId',
-      as: 'users',
+      foreignKey: "roleId",
+      as: "users",
     });
   }
 }

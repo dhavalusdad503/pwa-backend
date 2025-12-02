@@ -1,10 +1,10 @@
-import express from "express";
+import logger from "@utils/logger";
 import cors from "cors";
 import dotenv from "dotenv";
-import { BaseRoute } from "./routes/base.routes";
+import express from "express";
 import { sequelize } from "./database/db";
-import logger from "@utils/logger";
 import { initModels } from "./models";
+import { BaseRoute } from "./routes/base.routes";
 
 dotenv.config();
 
@@ -41,13 +41,13 @@ export default class App {
   public async listen(): Promise<void> {
     try {
       await sequelize.authenticate();
-      logger.info('✅ Database connection established successfully.');
-      
+      logger.info("✅ Database connection established successfully.");
+
       this.app.listen(this.port, () => {
         logger.info(`🚀 Server is running at http://localhost:${this.port}`);
       });
     } catch (error) {
-      logger.error('❌ Failed to start server:', error);
+      logger.error("❌ Failed to start server:", error);
       process.exit(1);
     }
   }

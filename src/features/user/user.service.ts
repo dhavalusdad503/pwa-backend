@@ -1,56 +1,74 @@
-import bcrypt from 'bcrypt';
-import User from '../../models/user.model';
-import userRepository from './user.repository';
+import User from "../../models/user.model";
+import userRepository from "./user.repository";
 
 export interface IUserService {
-  registerUser(userData: { name: string; email: string; password: string }): Promise<User>;
-  loginUser(email: string, password: string): Promise<{ user: User; token: string }>;
-  updateUser(id: number, userData: { name?: string; email?: string }): Promise<User>;
+  // registerUser(userData: {
+  //   name: string;
+  //   email: string;
+  //   password: string;
+  // }): Promise<User>;
+  // loginUser(
+  //   email: string,
+  //   password: string
+  // ): Promise<{ user: User; token: string }>;
+  updateUser(
+    id: number,
+    userData: { name?: string; email?: string }
+  ): Promise<User>;
   getUserById(id: number): Promise<User>;
   deleteUser(id: number): Promise<boolean>;
 }
 
 class UserService implements IUserService {
-  async registerUser(userData: { name: string; email: string; password: string }): Promise<User> {
+  // async registerUser(userData: {
+  //   name: string;
+  //   email: string;
+  //   password: string;
+  // }): Promise<User> {
+  //   const existingUser = await userRepository.findByEmail(userData.email);
+  //   if (existingUser) {
+  //     throw new Error("Email is already in use");
+  //   }
 
-    const existingUser = await userRepository.findByEmail(userData.email);
-    if (existingUser) {
-      throw new Error('Email is already in use');
-    }
+  //   const hashedPassword = await bcrypt.hash(userData.password, 10);
 
-    const hashedPassword = await bcrypt.hash(userData.password, 10);
+  //   return await userRepository.create({
+  //     name: userData.name,
+  //     email: userData.email,
+  //     password: hashedPassword,
+  //   } as User);
+  // }
 
-    return await userRepository.create({
-      name: userData.name,
-      email: userData.email,
-      password: hashedPassword,
-    } as User);
-  }
+  // async loginUser(
+  //   email: string,
+  //   password: string
+  // ): Promise<{ user: User; token: string }> {
+  //   const user = await userRepository.findByEmail(email);
+  //   if (!user) {
+  //     throw new Error("Invalid email or password");
+  //   }
 
-  async loginUser(email: string, password: string): Promise<{ user: User; token: string }> {
-    const user = await userRepository.findByEmail(email);
-    if (!user) {
-      throw new Error('Invalid email or password');
-    }
+  //   const isPasswordValid = await user.comparePassword(password);
+  //   if (!isPasswordValid) {
+  //     throw new Error("Invalid email or password");
+  //   }
 
-    const isPasswordValid = await user.comparePassword(password);
-    if (!isPasswordValid) {
-      throw new Error('Invalid email or password');
-    }
+  //   const token = user.generateToken();
 
-    const token = user.generateToken();
+  //   return { user, token };
+  // }
 
-    return { user, token };
-  }
-
-  async updateUser(id: number, userData: { name?: string; email?: string }): Promise<User> {
+  async updateUser(
+    id: number,
+    userData: { name?: string; email?: string }
+  ): Promise<User> {
     if (!id || isNaN(+id)) {
-      throw new Error('Valid User ID is required for update');
+      throw new Error("Valid User ID is required for update");
     }
 
     const existingUser = await userRepository.findById(id);
     if (!existingUser) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
 
     return await userRepository.update(id, userData);
@@ -59,7 +77,7 @@ class UserService implements IUserService {
   async getUserById(id: number): Promise<User> {
     const user = await userRepository.findById(id);
     if (!user) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
     return user;
   }
@@ -69,4 +87,4 @@ class UserService implements IUserService {
   }
 }
 
-export default new UserService(); 
+export default new UserService();

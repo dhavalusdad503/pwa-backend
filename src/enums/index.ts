@@ -1,18 +1,18 @@
 export enum Roles {
-    CAREGIVER = 'CAREGIVER',
-    SUPERVISOR = 'SUPERVISOR',
-    ADMIN = 'ADMIN',
+  CAREGIVER = "CAREGIVER",
+  SUPERVISOR = "SUPERVISOR",
+  ADMIN = "ADMIN",
 }
 
 export enum UserStatus {
-    ACTIVE = 'ACTIVE',
-    INACTIVE = 'INACTIVE',
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
 }
 
 export enum AuthProvider {
-    EMAIL = 'email',
-    GOOGLE = 'google',
-    FACEBOOK = 'facebook',
-    GITHUB = 'github',
-    TWITTER = 'twitter',
+  EMAIL = "email",
+  GOOGLE = "google",
+  FACEBOOK = "facebook",
+  GITHUB = "github",
+  TWITTER = "twitter",
 }

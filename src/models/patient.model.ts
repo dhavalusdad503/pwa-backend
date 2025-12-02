@@ -1,6 +1,16 @@
-import { Model, DataTypes, Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import {
+  CreationOptional,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  Sequelize,
+} from "sequelize";
 
-class Patient extends Model<InferAttributes<Patient>, InferCreationAttributes<Patient>> {
+class Patient extends Model<
+  InferAttributes<Patient>,
+  InferCreationAttributes<Patient>
+> {
   declare id: CreationOptional<string>;
   declare orgId: string;
   declare name: string | null;
@@ -12,7 +22,7 @@ class Patient extends Model<InferAttributes<Patient>, InferCreationAttributes<Pa
     Patient.init(
       {
         id: {
-          type: DataTypes.UUID, 
+          type: DataTypes.UUID,
           defaultValue: DataTypes.UUIDV4,
           primaryKey: true,
           allowNull: false,
@@ -20,12 +30,12 @@ class Patient extends Model<InferAttributes<Patient>, InferCreationAttributes<Pa
         orgId: {
           type: DataTypes.UUID,
           allowNull: false,
-          field: 'org_id',
+          field: "org_id",
           references: {
-            model: 'organizations',
-            key: 'id',
+            model: "organizations",
+            key: "id",
           },
-          onDelete: 'CASCADE',
+          onDelete: "CASCADE",
         },
         name: {
           type: DataTypes.STRING,
@@ -34,24 +44,24 @@ class Patient extends Model<InferAttributes<Patient>, InferCreationAttributes<Pa
         primaryAddress: {
           type: DataTypes.STRING,
           allowNull: true,
-          field: 'primary_address',
+          field: "primary_address",
         },
         createdAt: {
           type: DataTypes.DATE,
           defaultValue: DataTypes.NOW,
           allowNull: false,
-          field: 'created_at',
+          field: "created_at",
         },
         updatedAt: {
           type: DataTypes.DATE,
           defaultValue: DataTypes.NOW,
           allowNull: false,
-          field: 'updated_at',
+          field: "updated_at",
         },
       },
       {
         sequelize,
-        tableName: 'patients',
+        tableName: "patients",
         timestamps: true,
         underscored: true,
       }
@@ -61,7 +71,10 @@ class Patient extends Model<InferAttributes<Patient>, InferCreationAttributes<Pa
   }
 
   public static associate(models: any): void {
-    Patient.belongsTo(models.Organization, { foreignKey: 'orgId', as: 'organization' });
+    Patient.belongsTo(models.Organization, {
+      foreignKey: "orgId",
+      as: "organization",
+    });
   }
 }
 

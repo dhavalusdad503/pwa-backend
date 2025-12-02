@@ -1,29 +1,14 @@
-import { asyncHandler } from "@helper";
 import { verifyJWTToken } from "@middlewares/auth.middleware";
 import { BaseRoute } from "@routes/base.routes";
-import visitController from "./visit.controller";
-import { validationMiddleware } from "@utils/validationMiddleware";
-import { createVisitSchema } from "@features/visit/visit.dto";
 
-export default class VisitRoute extends BaseRoute {
+export default class PatientRoute extends BaseRoute {
   constructor() {
-    super("/visit");
+    super("/patient");
   }
 
   protected initializeRoutes(): void {
     this.router.use(verifyJWTToken);
 
-    this.router.post(
-      "/create",
-      verifyJWTToken,
-      // validationMiddleware(createVisitSchema),
-      asyncHandler(visitController.create)
-    );
-    this.router.get(
-      "/",
-      verifyJWTToken,
-      asyncHandler(visitController.getAll)
-    );
     // this.router.get("/", verifyJWTToken, asyncHandler(visitController.getAll));
     // this.router.get("/:id", asyncHandler(visitController.getById));
     // this.router.put("/:id", validationMiddleware(updateVisitSchema), asyncHandler(visitController.update));
