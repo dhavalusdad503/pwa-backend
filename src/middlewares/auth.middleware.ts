@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 const SECRET_KEY = process.env.JWT_SECRET || "secret";
 
 export interface AuthRequest extends Request {
-  user?: {
+  user: {
     id: string;
     email: string;
   };

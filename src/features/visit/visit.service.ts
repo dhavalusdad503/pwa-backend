@@ -1,25 +1,62 @@
+import { OrgRepository } from "@features/organization";
+import { PatientRepository } from "@features/patient";
+import { extractErrorMessage } from "@helper";
+import { sequelize } from "@models";
 import Visit from "../../models/visit.model";
 import { CreateVisitDto, UpdateVisitDto } from "./visit.dto";
 import VisitRepository from "./visit.repository";
 
 class VisitService {
   private visitRepository: typeof VisitRepository;
+  private patientRepository: typeof PatientRepository;
+  private orgRepository: typeof OrgRepository;
 
   constructor() {
     this.visitRepository = VisitRepository;
+    this.patientRepository = PatientRepository;
+    this.orgRepository = OrgRepository;
   }
 
-  async createVisit(visitData: CreateVisitDto): Promise<Visit> {
-    const CreateVisitData = {
+  async createVisit(visitData: CreateVisitDto): Promise<void> {
+    let createVisitData = {
       caregiverId: visitData.id,
       notes: visitData.notes,
       serviceType: visitData?.serviceType.value,
-      patientId: visitData.PatientId,
+      patientId: "",
       startedAt: visitData.start_time,
       endedAt: visitData.end_time,
-      orgId: visitData.OrgId,
+      orgId: "",
     };
-    return await this.visitRepository.create(CreateVisitData);
+    const transaction = await sequelize.transaction();
+    try {
+      const organization = await this.orgRepository.findOne({
+        where: { name: visitData.OrgName },
+      });
+
+      createVisitData.orgId = organization?.id || " ";
+
+      const findPatient = await this.patientRepository.findPatientByName(
+        visitData?.patientName
+      );
+      if (!findPatient) {
+        const createPatient = await this.patientRepository.create(
+          {
+            name: visitData?.patientName,
+            orgId: createVisitData?.orgId,
+          },
+          { transaction }
+        );
+        createVisitData.patientId = createPatient?.id;
+      } else {
+        createVisitData.patientId = findPatient?.id;
+      }
+
+      await this.visitRepository.create(createVisitData, { transaction });
+      transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw new Error(extractErrorMessage(error, "Error in creating Visit"));
+    }
   }
 
   async getAllVisits(id: string | number): Promise<Visit[]> {

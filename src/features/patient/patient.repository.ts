@@ -13,6 +13,7 @@ export interface IPatientRepository {
   delete(id: string): Promise<boolean>;
   findAll(): Promise<Patient[]>;
   count(): Promise<number>;
+  findPatientByName(name: string): Promise<Patient | null>;
 }
 
 class PatientRepository
@@ -26,6 +27,9 @@ class PatientRepository
   async dataExists(): Promise<boolean> {
     const count = await this.count();
     return count > 0;
+  }
+  async findPatientByName(name: string): Promise<Patient | null> {
+    return await this.findOne({ where: { name } });
   }
 }
 

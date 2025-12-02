@@ -41,6 +41,7 @@ export interface CreateVisitDto {
   address: string;
   id: string;
   OrgId: string;
+  OrgName: string;
 }
 
 export interface UpdateVisitDto {

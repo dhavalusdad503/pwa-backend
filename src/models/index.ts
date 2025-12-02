@@ -33,4 +33,4 @@ export const initModels = () => {
   Visit.associate(models);
 };
 
-export { Organization, OrgUser, Patient, Role, User, Visit };
+export { Organization, OrgUser, Patient, Role, sequelize, User, Visit };
