@@ -1,3 +1,5 @@
+import { decryptRequest } from "@middlewares/decrypt.middleware";
+import { encryptResponse } from "@middlewares/encrypt.middleware";
 import logger from "@utils/logger";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -27,9 +29,12 @@ export default class App {
       cors({
         origin: "*",
         methods: ["GET", "POST", "PUT", "DELETE"],
-        allowedHeaders: ["Content-Type", "Authorization"],
+        allowedHeaders: ["Content-Type", "Authorization", "x-aes-key"],
+        exposedHeaders: ["x-encrypted-response"],
       })
     );
+    this.app.use(decryptRequest);
+    this.app.use(encryptResponse);
   }
 
   private initializeRoutes(routes: BaseRoute[]): void {

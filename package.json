@@ -12,7 +12,9 @@
     "migrate:undo:all": "sequelize-cli db:migrate:undo:all",
     "migrate:status": "sequelize-cli db:migrate:status",
     "migrate:generate": "sequelize-cli migration:generate --name",
-    "seed": "ts-node src/seeders/seed.ts"
+    "seed": "ts-node src/seeders/seed.ts",
+    "generate:rsaKey": "ts-node src/generateKeys/rsaKey.ts",
+    "generate:aesKey": "ts-node src/generateKeys/aesKey.ts"
   },
   "keywords": [],
   "author": "",
