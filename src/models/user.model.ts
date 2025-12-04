@@ -1,7 +1,6 @@
 import { AuthProvider, UserStatus } from "@enums";
 import Role from "@models/roles.model";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import {
   CreationOptional,
   DataTypes,
