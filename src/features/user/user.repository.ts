@@ -23,9 +23,13 @@ class UserRepository extends BaseRepository<User> implements IUserRepository {
     super(User);
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async findByEmail(
+    email: string,
+    attributes?: string[]
+  ): Promise<User | null> {
     return await this.findOne({
       where: { email },
+      attributes,
     });
   }
 
