@@ -25,8 +25,6 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare authProvider: string;
   declare status: string;
   declare role?: Role;
-  declare readonly createdAt: CreationOptional<Date>;
-  declare readonly updatedAt: CreationOptional<Date>;
 
   public async comparePassword(password: string): Promise<boolean> {
     return bcrypt.compare(password, this.password);
@@ -106,19 +104,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
           ),
           defaultValue: AuthProvider.EMAIL,
           allowNull: false,
-        },
-        createdAt: {
-          type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW,
-          allowNull: false,
-          field: "created_at",
-        },
-        updatedAt: {
-          type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW,
-          allowNull: false,
-          field: "updated_at",
-        },
+        }
       },
       {
         sequelize,

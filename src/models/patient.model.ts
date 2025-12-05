@@ -15,8 +15,6 @@ class Patient extends Model<
   declare orgId: string;
   declare name: string | null;
   declare primaryAddress: string | null;
-  declare createdAt: CreationOptional<Date>;
-  declare updatedAt: CreationOptional<Date>;
 
   public static initModel(sequelize: Sequelize): typeof Patient {
     Patient.init(
@@ -45,18 +43,6 @@ class Patient extends Model<
           type: DataTypes.STRING,
           allowNull: true,
           field: "primary_address",
-        },
-        createdAt: {
-          type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW,
-          allowNull: false,
-          field: "created_at",
-        },
-        updatedAt: {
-          type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW,
-          allowNull: false,
-          field: "updated_at",
         },
       },
       {

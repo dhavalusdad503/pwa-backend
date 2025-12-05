@@ -49,6 +49,30 @@ class VisitController {
     }
   }
 
+  async getUpdatedVisit(req: Request, res: Response): Promise<Response> {
+    try {
+      const { after } = req.params;
+      const { id } = {id: undefined};
+      const unixSeconds = Number(after);     // convert to number
+      const utcTimestamp = new Date(unixSeconds * 1000).toISOString();
+      if (!utcTimestamp) {
+        return res.status(404).json({ message: "Invalid Timestamp" });
+      }
+
+      const modifiedVisits = await visitService.getModifiedVisits(id, utcTimestamp);
+      const deletedVisits = await visitService.getDeletedVisits(id, utcTimestamp);
+
+      if (!modifiedVisits && !deletedVisits) {
+        return res.status(404).json({ message: "Visit not found" });
+      }
+
+      return res.status(200).json({ modifiedVisits, deletedVisits });
+    } catch (error) {
+      logger.error("Error fetching visit:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
   async update(req: Request, res: Response): Promise<Response> {
     try {
       const { id } = req.params;

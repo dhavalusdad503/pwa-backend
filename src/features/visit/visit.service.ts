@@ -1,7 +1,8 @@
 import { OrgRepository } from "@features/organization";
 import { PatientRepository } from "@features/patient";
 import { extractErrorMessage } from "@helper";
-import { Patient, sequelize } from "@models"; 
+import { Patient, sequelize } from "@models";
+import { Op, Sequelize } from "sequelize";
 import Visit from "../../models/visit.model";
 import { CreateVisitDto, UpdateVisitDto } from "./visit.dto";
 import VisitRepository from "./visit.repository";
@@ -17,12 +18,12 @@ class VisitService {
     this.orgRepository = OrgRepository;
   }
 
-  async createVisit(visitData: CreateVisitDto): Promise<{id:string}> {
+  async createVisit(visitData: CreateVisitDto): Promise<{ id: string }> {
     let createVisitData = {
       caregiverId: visitData.id,
       notes: visitData.notes,
       serviceType: visitData?.serviceType,
-      patientId: "", 
+      patientId: "",
       startedAt: visitData.startedAt,
       endedAt: visitData.endedAt,
       submittedAt: visitData.submittedAt,
@@ -54,7 +55,7 @@ class VisitService {
 
       const visit = await this.visitRepository.create(createVisitData, { transaction });
       transaction.commit();
-      return {id: visit?.id};
+      return { id: visit?.id };
     } catch (error) {
       await transaction.rollback();
       throw new Error(extractErrorMessage(error, "Error in creating Visit"));
@@ -62,16 +63,48 @@ class VisitService {
   }
 
   async getAllVisits(id: string | number): Promise<Visit[]> {
-    return await this.visitRepository.findAll({ 
-        attributes: { exclude: ['orgId', 'patientId','updatedAt'] } ,
-        where: { caregiverId: id },
-        include: [
-            {
-              model: Patient,
-              as: "patient",
-            }
-        ],
-     });
+    return await this.visitRepository.findAll({
+      attributes: { exclude: ['orgId', 'patientId', 'updatedAt'] },
+      where: { caregiverId: id },
+      include: [
+        {
+          model: Patient,
+          as: "patient",
+        }
+      ],
+    });
+  }
+
+  //visits modified after time
+  async getModifiedVisits(userId?: string, time?: string): Promise<Visit[]> {
+    return await this.visitRepository.findAll({
+      where: {
+        ...(time
+          ? { updatedAt: { [Op.gt]: time } }
+          : { updatedAt: { [Op.ne]: Sequelize.col('createdAt') } }
+        ),
+        ...(userId && { caregiverId: userId })
+      },
+      include: [
+        {
+          model: Patient,
+          as: "patient",
+          attributes: ['id', 'name'],
+        }
+      ],
+    });
+  }
+
+  //visits deleted after time
+  async getDeletedVisits(userId?: string, time?: string): Promise<Visit[]> {
+    return await this.visitRepository.findAll({
+      attributes: ['id'],
+      where: {
+        deletedAt: { ...(time ? { [Op.gt]: time } : { [Op.not]: null }) },
+        ...(userId && { caregiverId: userId })
+      },
+      paranoid: false,
+    });
   }
 
   async getVisitById(id: string): Promise<Visit | null> {
