@@ -1,12 +1,12 @@
 import logger from "@utils/logger";
+
+import { ENV_CONFIG } from "@config/envConfig";
+import RedisService from "@utils/redisService";
 import cors from "cors";
-import dotenv from "dotenv";
 import express from "express";
 import { sequelize } from "./database/db";
 import { initModels } from "./models";
 import { BaseRoute } from "./routes/base.routes";
-
-dotenv.config();
 
 export default class App {
   public app: express.Application;
@@ -14,7 +14,7 @@ export default class App {
 
   constructor(routes: BaseRoute[]) {
     this.app = express();
-    this.port = Number(process.env.PORT) || 3000;
+    this.port = ENV_CONFIG.PORT;
 
     this.initializeMiddlewares();
     initModels();
@@ -42,6 +42,8 @@ export default class App {
     try {
       await sequelize.authenticate();
       logger.info("✅ Database connection established successfully.");
+
+      await RedisService.connect();
 
       this.app.listen(this.port, () => {
         logger.info(`🚀 Server is running at http://localhost:${this.port}`);

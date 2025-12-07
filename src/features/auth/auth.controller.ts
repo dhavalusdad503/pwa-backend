@@ -1,9 +1,14 @@
-import { AUTH_MESSAGES, STATUS } from "@features/auth/auth.constant";
+import {
+  AUTH_MESSAGES,
+  REDIS_RESET_PASSWORD_KEY_PREFIX,
+  STATUS,
+} from "@features/auth/auth.constant";
 import userRepository from "@features/user/user.repository";
 import { extractErrorInfo } from "@helper";
 import { decrypt } from "@utils";
 import { createJWTToken, verifyJWTToken } from "@utils/jwt";
 import logger from "@utils/logger";
+import RedisService from "@utils/redisService";
 import { Request, Response } from "express";
 import { errorResponse, successResponse } from "../../utils/responseHandler";
 import authService from "./auth.service";
@@ -138,6 +143,10 @@ class AuthController {
     try {
       const { token } = req.query;
 
+      if (!token) {
+        return errorResponse(res, AUTH_MESSAGES.INVALID_TOKEN, 400);
+      }
+
       const tokenData = decrypt(token as string);
       const tokenObj = tokenData && JSON.parse(tokenData);
 
@@ -145,9 +154,22 @@ class AuthController {
         return errorResponse(res, AUTH_MESSAGES.INVALID_TOKEN, 400);
       }
 
+      const redisClient = RedisService.getClient();
+      const redisKey = `${REDIS_RESET_PASSWORD_KEY_PREFIX}_${tokenObj.id}`;
+      const redisValue = await redisClient.get(redisKey);
+
+      if (!redisValue) {
+        return errorResponse(res, AUTH_MESSAGES.INVALID_TOKEN, 400);
+      }
+
       const tokenExpiryDate = new Date(tokenObj?.tokenExpiryDate);
       const now = new Date();
       const isValidateToken = now < tokenExpiryDate;
+
+      if (!isValidateToken) {
+        await redisClient.del(redisKey);
+        return errorResponse(res, AUTH_MESSAGES.INVALID_TOKEN, 400);
+      }
 
       successResponse(res, { isValid: isValidateToken });
     } catch (error) {

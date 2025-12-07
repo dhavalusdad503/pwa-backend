@@ -1,25 +1,23 @@
 import * as path from "path";
 
+import { ENV_CONFIG } from "@config/envConfig";
 import logger from "@utils/logger";
-import dotenv from "dotenv";
 import ejs from "ejs";
 import nodemailer from "nodemailer";
 import { Attachment } from "nodemailer/lib/mailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 
-dotenv.config();
-
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT || 587,
+  host: ENV_CONFIG.MAIL_CONFIG.HOST,
+  port: ENV_CONFIG.MAIL_CONFIG.PORT,
   secure: false,
   requireTLS: true,
   pool: true, // Enable connection pooling
   maxConnections: 5, // Limit simultaneous connections
   maxMessages: 100, // Max emails per connection
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
+    user: ENV_CONFIG.MAIL_CONFIG.USER,
+    pass: ENV_CONFIG.MAIL_CONFIG.PASSWORD,
   },
 } as SMTPTransport.Options);
 
@@ -47,7 +45,7 @@ export const sendMail = async ({
   const mailOptions = {
     from: {
       name: mail_from,
-      address: process.env.SMTP_FROM || "",
+      address: ENV_CONFIG.MAIL_CONFIG.FROM_EMAIL || "",
     },
     to: to.join(),
     subject,

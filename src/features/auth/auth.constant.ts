@@ -14,3 +14,4 @@ export const STATUS = {
 };
 
 export const RESET_PASS_TOKEN_EXPIRY_MINUTES = 5;
+export const REDIS_RESET_PASSWORD_KEY_PREFIX = "reset_password_token";

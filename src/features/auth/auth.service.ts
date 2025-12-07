@@ -1,16 +1,18 @@
+import { ENV_CONFIG } from "@config/envConfig";
 import { TEMPLATE_NAME } from "@constants";
 import { Roles } from "@enums";
 import {
   AUTH_MESSAGES,
+  REDIS_RESET_PASSWORD_KEY_PREFIX,
   RESET_PASS_TOKEN_EXPIRY_MINUTES,
 } from "@features/auth/auth.constant";
 import { combineName, encrypt } from "@utils";
 import { createJWTRefreshToken, createJWTToken } from "@utils/jwt";
 import logger from "@utils/logger";
+import RedisService from "@utils/redisService";
 import { sendMail } from "@utils/sendMail";
 import bcrypt from "bcrypt";
 import { addMinutes } from "date-fns";
-import dotenv from "dotenv";
 import Role from "../../models/roles.model";
 import User from "../../models/user.model";
 import userRepository from "../user/user.repository";
@@ -22,14 +24,10 @@ import {
   SendResetPasswordDto,
 } from "./auth.dto";
 
-dotenv.config();
-
 export interface IAuthService {
   register(data: RegisterDto): Promise<User>;
   login(data: LoginDto): Promise<{ user: User; token: string }>;
 }
-
-export const { FRONTEND_BASE_URL } = process.env;
 
 class AuthService implements IAuthService {
   async register(data: RegisterDto): Promise<User> {
@@ -87,6 +85,15 @@ class AuthService implements IAuthService {
         })
       );
 
+      const redisClient = RedisService.getClient();
+
+      await redisClient.set(
+        `${REDIS_RESET_PASSWORD_KEY_PREFIX}_${id}`,
+        token,
+        "EX",
+        Number(RESET_PASS_TOKEN_EXPIRY_MINUTES) * 60
+      );
+
       const commonPath = `/reset-password?token=${token}`;
       sendMail({
         subject: `Reset your password`,
@@ -94,7 +101,7 @@ class AuthService implements IAuthService {
         to: [email],
         replacement: {
           name: combineName({ names: [firstName, lastName] }),
-          redirect_url: `${FRONTEND_BASE_URL}${commonPath}`,
+          redirect_url: `${ENV_CONFIG.FRONTEND_BASE_URL}${commonPath}`,
         },
       });
     } catch (error) {
@@ -105,7 +112,22 @@ class AuthService implements IAuthService {
 
   async resetPassword(data: ResetPasswordDto): Promise<LoginResponseDto> {
     try {
-      const { email, id } = data.token;
+      const { new_password } = data;
+      const { email, id, tokenExpiryDate } = data.token;
+
+      const redisClient = RedisService.getClient();
+      const redisKey = `${REDIS_RESET_PASSWORD_KEY_PREFIX}_${id}`;
+      const redisValue = await redisClient.get(redisKey);
+
+      if (!redisValue) {
+        logger.error("Token not found or already used.");
+        throw new Error(AUTH_MESSAGES.INVALID_TOKEN);
+      }
+
+      if (new Date() > new Date(tokenExpiryDate)) {
+        await redisClient.del(redisKey);
+        throw new Error(AUTH_MESSAGES.INVALID_TOKEN);
+      }
 
       const user = await userRepository.findByEmail(email, [
         "id",
@@ -118,36 +140,21 @@ class AuthService implements IAuthService {
         throw new Error(AUTH_MESSAGES.USER_NOT_FOUND);
       }
 
-      if (new Date() > new Date(data.token.tokenExpiryDate)) {
-        logger.error("resetPassword service Token Invalid");
-        throw new Error(AUTH_MESSAGES.INVALID_TOKEN);
-      }
-
-      if (!user.password) {
-        const hashedPassword = await bcrypt.hash(data.new_password, 10);
-        await userRepository.update(id, {
-          password: hashedPassword,
-        });
-
-        const loginData = await this.login({
-          email,
-          password: data.new_password,
-        });
-
-        return loginData;
-      }
-
-      const isCurrentPasswordSame = await user.comparePassword(
-        data.new_password
-      );
-      if (isCurrentPasswordSame) {
-        throw new Error(AUTH_MESSAGES.SAME_PREVIOUS_PASSWORD);
+      if (user.password) {
+        const isSamePassword = await user.comparePassword(new_password);
+        if (isSamePassword) {
+          throw new Error(AUTH_MESSAGES.SAME_PREVIOUS_PASSWORD);
+        }
       }
 
       const hashedPassword = await bcrypt.hash(data.new_password, 10);
+
       await userRepository.update(id, {
         password: hashedPassword,
       });
+
+      await redisClient.del(redisKey);
+      logger.info(`Reset token deleted from redis: ${redisKey}`);
 
       const loginData = await this.login({
         email,

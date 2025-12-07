@@ -1,10 +1,8 @@
+import { ENV_CONFIG } from "@config/envConfig";
 import CryptoJS from "crypto-js";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 export const encrypt = (data: string) => {
-  const secretKey = process.env.SECRET_KEY;
+  const secretKey = ENV_CONFIG.SECRET_KEY;
   if (!secretKey) throw "SECRET_KEY is missing in env";
   const cipherText = encodeURIComponent(
     CryptoJS.AES.encrypt(data, secretKey).toString()
@@ -14,7 +12,7 @@ export const encrypt = (data: string) => {
 
 export const decrypt = (data: string) => {
   try {
-    const secretKey = process.env.SECRET_KEY;
+    const secretKey = ENV_CONFIG.SECRET_KEY;
     if (!secretKey) throw "SECRET_KEY is missing in env";
     const bytes = CryptoJS.AES.decrypt(
       decodeURIComponent(data),

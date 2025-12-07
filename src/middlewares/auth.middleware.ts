@@ -1,11 +1,10 @@
+import { ENV_CONFIG } from "@config/envConfig";
 import { extractErrorInfo } from "@helper";
 import { verifyJWTToken as verifyToken } from "@utils/jwt";
 import logger from "@utils/logger";
 import { errorResponse } from "@utils/responseHandler";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-
-const SECRET_KEY = process.env.JWT_SECRET || "secret";
 
 export interface AuthRequest extends Request {
   user: {
@@ -29,7 +28,7 @@ export const authMiddleware = (
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, SECRET_KEY);
+    const decoded = jwt.verify(token, ENV_CONFIG.JWT_SECRET_KEY);
     req.user = decoded as { id: string; email: string };
     next();
   } catch (error) {
