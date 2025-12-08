@@ -64,7 +64,7 @@ export interface TokenPayload {
 }
 
 export interface ResetPasswordDto {
-  token: TokenPayload;
+  token: string;
   new_password: string;
 }
 

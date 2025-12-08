@@ -1,14 +1,9 @@
-import {
-  AUTH_MESSAGES,
-  REDIS_RESET_PASSWORD_KEY_PREFIX,
-  STATUS,
-} from "@features/auth/auth.constant";
-import userRepository from "@features/user/user.repository";
+import { AUTH_MESSAGES, STATUS } from "@features/auth/auth.constant";
+import { userService } from "@features/user";
 import { extractErrorInfo } from "@helper";
 import { decrypt } from "@utils";
 import { createJWTToken, verifyJWTToken } from "@utils/jwt";
 import logger from "@utils/logger";
-import RedisService from "@utils/redisService";
 import { Request, Response } from "express";
 import { errorResponse, successResponse } from "../../utils/responseHandler";
 import authService from "./auth.service";
@@ -106,10 +101,13 @@ class AuthController {
   async forgotPassword(req: Request, res: Response) {
     try {
       const { email } = req.body;
-      const user = await userRepository.findByEmail(email);
-      if (!user) {
-        return errorResponse(res, AUTH_MESSAGES.USER_NOT_FOUND, 404);
-      }
+      const user = await userService.findUserByEmail(email, [
+        "id",
+        "email",
+        "firstName",
+        "lastName",
+        "status",
+      ]);
 
       if (user.status !== STATUS.ACTIVE) {
         return errorResponse(res, AUTH_MESSAGES.USER_NOT_ACTIVE, 404);
@@ -154,11 +152,11 @@ class AuthController {
         return errorResponse(res, AUTH_MESSAGES.INVALID_TOKEN, 400);
       }
 
-      const redisClient = RedisService.getClient();
-      const redisKey = `${REDIS_RESET_PASSWORD_KEY_PREFIX}_${tokenObj.id}`;
-      const redisValue = await redisClient.get(redisKey);
+      const storeToken = await userService.getResetPasswordTokenUsingUserId({
+        user_id: tokenObj?.id,
+      });
 
-      if (!redisValue) {
+      if (!storeToken) {
         return errorResponse(res, AUTH_MESSAGES.INVALID_TOKEN, 400);
       }
 
@@ -167,7 +165,6 @@ class AuthController {
       const isValidateToken = now < tokenExpiryDate;
 
       if (!isValidateToken) {
-        await redisClient.del(redisKey);
         return errorResponse(res, AUTH_MESSAGES.INVALID_TOKEN, 400);
       }
 
@@ -185,15 +182,10 @@ class AuthController {
   async resetPassword(req: Request, res: Response) {
     try {
       const { new_password, token } = req.body;
-      const tokenData = decrypt(token);
-      const tokenObj = tokenData && JSON.parse(tokenData);
-      if (!tokenObj) {
-        return errorResponse(res, AUTH_MESSAGES.INVALID_TOKEN, 400);
-      }
 
       const user = await authService.resetPassword({
         new_password,
-        token: tokenObj,
+        token: token,
       });
 
       return successResponse(res, user, AUTH_MESSAGES.PASSWORD_RESET);

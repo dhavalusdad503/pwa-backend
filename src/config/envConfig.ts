@@ -21,7 +21,7 @@ export const ENV_CONFIG = {
     PORT: Number(process.env.SMTP_PORT) || 587,
     USER: process.env.SMTP_USER || "",
     PASSWORD: process.env.SMTP_PASSWORD || "",
-    FROM_EMAIL: process.env.FROM_EMAIL || "",
+    FROM_EMAIL: process.env.SMTP_FROM || "",
   },
   REDIS_CONFIG: {
     HOST: process.env.REDIS_HOST || "localhost",

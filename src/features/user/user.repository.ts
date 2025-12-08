@@ -23,6 +23,17 @@ class UserRepository extends BaseRepository<User> implements IUserRepository {
     super(User);
   }
 
+  async getResetPassTokenByUserId(data: {
+    user_id: string;
+  }): Promise<string | null | undefined> {
+    const { user_id } = data;
+    const userData = await this.findOne({
+      where: { id: user_id },
+      attributes: ["resetPassToken"],
+    });
+    return userData?.resetPassToken;
+  }
+
   async findByEmail(
     email: string,
     attributes?: string[]
@@ -38,6 +49,18 @@ class UserRepository extends BaseRepository<User> implements IUserRepository {
       where: { email },
       include: [{ model: Role, as: "role" }],
     });
+  }
+
+  async updateUserPassword(
+    id: string | number,
+    password: string,
+    transaction?: Transaction
+  ): Promise<User> {
+    return await this.update(
+      id,
+      { password, resetPassToken: null },
+      transaction
+    );
   }
 
   async dataExists(): Promise<boolean> {

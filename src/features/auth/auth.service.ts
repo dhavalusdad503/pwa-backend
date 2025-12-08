@@ -3,13 +3,12 @@ import { TEMPLATE_NAME } from "@constants";
 import { Roles } from "@enums";
 import {
   AUTH_MESSAGES,
-  REDIS_RESET_PASSWORD_KEY_PREFIX,
   RESET_PASS_TOKEN_EXPIRY_MINUTES,
 } from "@features/auth/auth.constant";
-import { combineName, encrypt } from "@utils";
+import { userService } from "@features/user";
+import { combineName, decrypt, encrypt } from "@utils";
 import { createJWTRefreshToken, createJWTToken } from "@utils/jwt";
 import logger from "@utils/logger";
-import RedisService from "@utils/redisService";
 import { sendMail } from "@utils/sendMail";
 import bcrypt from "bcrypt";
 import { addMinutes } from "date-fns";
@@ -85,14 +84,9 @@ class AuthService implements IAuthService {
         })
       );
 
-      const redisClient = RedisService.getClient();
-
-      await redisClient.set(
-        `${REDIS_RESET_PASSWORD_KEY_PREFIX}_${id}`,
-        token,
-        "EX",
-        Number(RESET_PASS_TOKEN_EXPIRY_MINUTES) * 60
-      );
+      await userRepository.update(id, {
+        resetPassToken: token,
+      });
 
       const commonPath = `/reset-password?token=${token}`;
       sendMail({
@@ -112,32 +106,29 @@ class AuthService implements IAuthService {
 
   async resetPassword(data: ResetPasswordDto): Promise<LoginResponseDto> {
     try {
-      const { new_password } = data;
-      const { email, id, tokenExpiryDate } = data.token;
+      const { new_password, token } = data;
 
-      const redisClient = RedisService.getClient();
-      const redisKey = `${REDIS_RESET_PASSWORD_KEY_PREFIX}_${id}`;
-      const redisValue = await redisClient.get(redisKey);
-
-      if (!redisValue) {
-        logger.error("Token not found or already used.");
+      const tokenData = decrypt(token);
+      const tokenObj = tokenData && JSON.parse(tokenData);
+      if (!tokenObj) {
         throw new Error(AUTH_MESSAGES.INVALID_TOKEN);
       }
+      const { email, id, tokenExpiryDate } = tokenObj;
 
       if (new Date() > new Date(tokenExpiryDate)) {
-        await redisClient.del(redisKey);
         throw new Error(AUTH_MESSAGES.INVALID_TOKEN);
       }
 
-      const user = await userRepository.findByEmail(email, [
+      const user = await userService.findUserByEmail(email, [
         "id",
         "email",
         "password",
+        "resetPassToken",
       ]);
 
-      if (!user) {
-        logger.error("resetPassword service User not found");
-        throw new Error(AUTH_MESSAGES.USER_NOT_FOUND);
+      const storedToken = decodeURIComponent(user.resetPassToken || "");
+      if (!user.resetPassToken || (storedToken && data.token !== storedToken)) {
+        throw new Error(AUTH_MESSAGES.INVALID_TOKEN);
       }
 
       if (user.password) {
@@ -149,12 +140,7 @@ class AuthService implements IAuthService {
 
       const hashedPassword = await bcrypt.hash(data.new_password, 10);
 
-      await userRepository.update(id, {
-        password: hashedPassword,
-      });
-
-      await redisClient.del(redisKey);
-      logger.info(`Reset token deleted from redis: ${redisKey}`);
+      await userRepository.updateUserPassword(id, hashedPassword);
 
       const loginData = await this.login({
         email,

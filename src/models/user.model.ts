@@ -1,7 +1,6 @@
 import { AuthProvider, UserStatus } from "@enums";
 import Role from "@models/roles.model";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import {
   CreationOptional,
   DataTypes,
@@ -25,6 +24,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare authProvider: string;
   declare status: string;
   declare role?: Role;
+  declare resetPassToken?: string | null;
   declare readonly createdAt: CreationOptional<Date>;
   declare readonly updatedAt: CreationOptional<Date>;
 
@@ -106,6 +106,11 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
           ),
           defaultValue: AuthProvider.EMAIL,
           allowNull: false,
+        },
+        resetPassToken: {
+          type: DataTypes.STRING,
+          allowNull: true,
+          field: "reset_pass_token",
         },
         createdAt: {
           type: DataTypes.DATE,
