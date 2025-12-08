@@ -70,7 +70,7 @@ export const verifyJWTToken = (
   next: NextFunction
 ) => {
   try {
-    const isValid = verifyJWTTokenHelper(req, res);
+    const isValid = verifyJWTTokenHelper(req as AuthRequest, res);
 
     if (!isValid) {
       return;
