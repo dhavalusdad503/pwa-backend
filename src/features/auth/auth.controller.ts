@@ -76,6 +76,9 @@ class AuthController {
         const tokenPayload = {
           id: decodedToken?.id,
           email: decodedToken?.email,
+          role: decodedToken?.role,
+          role_id: decodedToken?.role_id,
+          org_id: decodedToken?.org_id,
         };
 
         const token = createJWTToken(tokenPayload);

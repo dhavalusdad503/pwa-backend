@@ -1,6 +1,5 @@
 import { AuthProvider } from "@enums";
 import { joiCommon } from "@helper/joi-schema.helper";
-import { User } from "@models";
 import Joi from "joi";
 
 export const registerSchema = Joi.object({
@@ -73,8 +72,21 @@ export interface UpdatePasswordDto {
   password: string;
 }
 
+export interface ResponseUserDtc {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  email: string;
+  phone: string | null;
+  role: {
+    id: string;
+    name: string;
+    slug: string;
+  } | null;
+}
+
 export interface LoginResponseDto {
-  user: User;
+  user: ResponseUserDtc;
   token: string;
   refreshToken: string;
 }

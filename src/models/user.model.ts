@@ -1,4 +1,5 @@
 import { AuthProvider, UserStatus } from "@enums";
+import Organization from "@models/organization.model";
 import Role from "@models/roles.model";
 import bcrypt from "bcrypt";
 import {
@@ -24,6 +25,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare authProvider: string;
   declare status: string;
   declare role?: Role;
+  declare organizations?: Organization[];
   declare resetPassToken?: string | null;
   declare readonly createdAt: CreationOptional<Date>;
   declare readonly updatedAt: CreationOptional<Date>;
@@ -147,6 +149,11 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     User.belongsTo(models.Role, {
       foreignKey: "roleId",
       as: "role",
+    });
+    User.belongsToMany(models.Organization, {
+      through: models.OrgUser,
+      foreignKey: "userId",
+      as: "organizations",
     });
   }
 }

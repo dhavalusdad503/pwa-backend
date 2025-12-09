@@ -25,7 +25,7 @@ import {
 
 export interface IAuthService {
   register(data: RegisterDto): Promise<User>;
-  login(data: LoginDto): Promise<{ user: User; token: string }>;
+  login(data: LoginDto): Promise<LoginResponseDto>;
 }
 
 class AuthService implements IAuthService {
@@ -55,6 +55,7 @@ class AuthService implements IAuthService {
     if (!user) {
       throw new Error("Invalid email or password");
     }
+
     const isPasswordValid = await user.comparePassword(data.password);
     if (!isPasswordValid) {
       throw new Error("Invalid email or password");
@@ -62,11 +63,29 @@ class AuthService implements IAuthService {
     const AuthTokenPayload = {
       id: user.id,
       email: user.email,
+      role: user.role?.slug,
+      role_id: user.roleId,
+      org_id: user.organizations?.map((org) => org.id),
+    };
+
+    const responseUser = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone ?? null,
+      role: user.role
+        ? {
+            id: user.roleId,
+            name: user.role.name,
+            slug: user.role.slug,
+          }
+        : null,
     };
     const token = createJWTToken(AuthTokenPayload);
     const refreshToken = createJWTRefreshToken(AuthTokenPayload);
 
-    return { user, token, refreshToken };
+    return { user: responseUser, token, refreshToken };
   }
 
   async sendResetPasswordLink(data: SendResetPasswordDto) {
