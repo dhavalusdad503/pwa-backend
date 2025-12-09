@@ -33,7 +33,7 @@ export default class AuthRoute extends BaseRoute {
       asyncHandler(authController.refreshToken)
     );
     this.router.post(
-      "/forget-password",
+      "/forgot-password",
       validationMiddleware(forgotPasswordSchema),
       asyncHandler(authController.forgotPassword)
     );
