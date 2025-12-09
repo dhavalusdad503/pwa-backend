@@ -3,5 +3,5 @@ export interface AuthTokenPayload {
   email: string;
   role?: string;
   role_id: string;
-  org_id?: string[];
+  org_id?: string;
 }

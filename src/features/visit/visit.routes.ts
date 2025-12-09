@@ -1,9 +1,9 @@
+import { Roles } from "@enums";
 import { asyncHandler } from "@helper";
 import { verifyJWTToken } from "@middlewares/auth.middleware";
+import { roleMiddleware } from "@middlewares/role.middleware";
 import { BaseRoute } from "@routes/base.routes";
 import visitController from "./visit.controller";
-import { validationMiddleware } from "@utils/validationMiddleware";
-import { createVisitSchema } from "@features/visit/visit.dto";
 
 export default class VisitRoute extends BaseRoute {
   constructor() {
@@ -19,10 +19,12 @@ export default class VisitRoute extends BaseRoute {
       // validationMiddleware(createVisitSchema),
       asyncHandler(visitController.create)
     );
+    this.router.get("/", verifyJWTToken, asyncHandler(visitController.getAll));
     this.router.get(
-      "/",
+      "/list",
+      roleMiddleware([Roles.ADMIN, Roles.SUPERVISOR]),
       verifyJWTToken,
-      asyncHandler(visitController.getAll)
+      asyncHandler(visitController.getAllVisitsByOrganization)
     );
     // this.router.get("/", verifyJWTToken, asyncHandler(visitController.getAll));
     // this.router.get("/:id", asyncHandler(visitController.getById));

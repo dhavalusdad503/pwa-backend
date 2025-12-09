@@ -3,9 +3,12 @@ import { TEMPLATE_NAME } from "@constants";
 import { Roles } from "@enums";
 import {
   AUTH_MESSAGES,
+  DEFAULT_ORG_NAME,
   RESET_PASS_TOKEN_EXPIRY_MINUTES,
 } from "@features/auth/auth.constant";
-import { userService } from "@features/user";
+import { OrgRepository } from "@features/organization";
+import { UserRepository, UserService } from "@features/user";
+import { extractErrorMessage } from "@helper";
 import { combineName, decrypt, encrypt } from "@utils";
 import { createJWTRefreshToken, createJWTToken } from "@utils/jwt";
 import logger from "@utils/logger";
@@ -14,7 +17,6 @@ import bcrypt from "bcrypt";
 import { addMinutes } from "date-fns";
 import Role from "../../models/roles.model";
 import User from "../../models/user.model";
-import userRepository from "../user/user.repository";
 import {
   LoginDto,
   LoginResponseDto,
@@ -23,14 +25,18 @@ import {
   SendResetPasswordDto,
 } from "./auth.dto";
 
-export interface IAuthService {
-  register(data: RegisterDto): Promise<User>;
-  login(data: LoginDto): Promise<LoginResponseDto>;
-}
+class AuthService {
+  private userRepository: typeof UserRepository;
+  private userService: typeof UserService;
+  private orgRepository: typeof OrgRepository;
 
-class AuthService implements IAuthService {
+  constructor() {
+    this.userRepository = UserRepository;
+    this.userService = UserService;
+    this.orgRepository = OrgRepository;
+  }
   async register(data: RegisterDto): Promise<User> {
-    const existingUser = await userRepository.findByEmail(data.email);
+    const existingUser = await this.userRepository.findByEmail(data.email);
 
     if (existingUser) {
       throw new Error("Email is already in use");
@@ -41,7 +47,7 @@ class AuthService implements IAuthService {
     )?.id;
 
     const hashedPassword = await bcrypt.hash(data.password, 10);
-    return await userRepository.create({
+    return await this.userRepository.create({
       firstName: data.firstName,
       lastName: data.lastName,
       email: data.email,
@@ -51,22 +57,45 @@ class AuthService implements IAuthService {
   }
 
   async login(data: LoginDto): Promise<LoginResponseDto> {
-    const user = await userRepository.findByEmailWithRole(data.email);
+    const user = await this.userRepository.findByEmailWithRole(data.email);
     if (!user) {
-      throw new Error("Invalid email or password");
+      throw new Error(AUTH_MESSAGES.INVALID_EMAIL_OR_PASSWORD);
     }
 
     const isPasswordValid = await user.comparePassword(data.password);
     if (!isPasswordValid) {
-      throw new Error("Invalid email or password");
+      throw new Error(AUTH_MESSAGES.INVALID_EMAIL_OR_PASSWORD);
     }
+
+    let orgId = data.org_id;
+    if (!orgId) {
+      const organization = await this.orgRepository.findByName(
+        DEFAULT_ORG_NAME
+      );
+
+      if (!organization) {
+        throw new Error(AUTH_MESSAGES.DEFAULT_ORG_NOT_FOUND);
+      }
+
+      orgId = organization.id;
+    } else {
+      const organization = await this.orgRepository.findById(orgId);
+
+      if (!organization) {
+        throw new Error(AUTH_MESSAGES.DEFAULT_ORG_NOT_FOUND);
+      }
+    }
+
     const AuthTokenPayload = {
       id: user.id,
       email: user.email,
       role: user.role?.slug,
       role_id: user.roleId,
-      org_id: user.organizations?.map((org) => org.id),
+      org_id: orgId,
     };
+
+    const token = createJWTToken(AuthTokenPayload);
+    const refreshToken = createJWTRefreshToken(AuthTokenPayload);
 
     const responseUser = {
       id: user.id,
@@ -82,8 +111,6 @@ class AuthService implements IAuthService {
           }
         : null,
     };
-    const token = createJWTToken(AuthTokenPayload);
-    const refreshToken = createJWTRefreshToken(AuthTokenPayload);
 
     return { user: responseUser, token, refreshToken };
   }
@@ -103,7 +130,7 @@ class AuthService implements IAuthService {
         })
       );
 
-      await userRepository.update(id, {
+      await this.userRepository.update(id, {
         resetPassToken: token,
       });
 
@@ -119,7 +146,11 @@ class AuthService implements IAuthService {
       });
     } catch (error) {
       logger.error("Error in sendResetPasswordLink service", error);
-      throw error;
+      const message = extractErrorMessage(
+        error,
+        "Error appending reset password token"
+      );
+      throw new Error(message);
     }
   }
 
@@ -138,7 +169,7 @@ class AuthService implements IAuthService {
         throw new Error(AUTH_MESSAGES.INVALID_TOKEN);
       }
 
-      const user = await userService.findUserByEmail(email, [
+      const user = await this.userService.findUserByEmail(email, [
         "id",
         "email",
         "password",
@@ -159,7 +190,7 @@ class AuthService implements IAuthService {
 
       const hashedPassword = await bcrypt.hash(data.new_password, 10);
 
-      await userRepository.updateUserPassword(id, hashedPassword);
+      await this.userRepository.updateUserPassword(id, hashedPassword);
 
       const loginData = await this.login({
         email,
@@ -169,7 +200,11 @@ class AuthService implements IAuthService {
       return loginData;
     } catch (error) {
       logger.error("Error in resetPassword service", error);
-      throw error;
+      const message = extractErrorMessage(
+        error,
+        "Error in resetPassword service"
+      );
+      throw new Error(message);
     }
   }
 }

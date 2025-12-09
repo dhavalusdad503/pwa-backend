@@ -155,6 +155,11 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
       foreignKey: "userId",
       as: "organizations",
     });
+
+    User.hasMany(models.OrgUser, {
+      foreignKey: "userId",
+      as: "userOrgs",
+    });
   }
 }
 

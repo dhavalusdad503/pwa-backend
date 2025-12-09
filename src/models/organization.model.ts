@@ -60,6 +60,10 @@ class Organization extends Model<
       foreignKey: "orgId",
       as: "users",
     });
+    Organization.hasMany(models.OrgUser, {
+      foreignKey: "orgId",
+      as: "orgUsers",
+    });
   }
 }
 
