@@ -23,6 +23,17 @@ class VisitController {
     }
   }
 
+  async createMany(req: AuthRequest, res: Response): Promise<Response> {
+    try {
+      const visits = await visitService.createManyVisits(req.body, req.user);
+      const data = visits;
+      return successResponse(res, data, "Visit created successfully");
+    } catch (error) {
+      logger.error("Error creating visit:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
   async getAll(req: AuthRequest, res: Response): Promise<Response> {
     try {
       const { id } = req.user;
@@ -34,6 +45,7 @@ class VisitController {
     }
   }
 
+
   async getById(req: Request, res: Response): Promise<Response> {
     try {
       const { id } = req.params;
@@ -44,6 +56,30 @@ class VisitController {
       }
 
       return res.status(200).json(visit);
+    } catch (error) {
+      logger.error("Error fetching visit:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
+  async getUpdatedVisit(req: Request, res: Response): Promise<Response> {
+    try {
+      const { after } = req.params;
+      const { id } = { id: undefined };
+      const unixSeconds = Number(after);     // convert to number
+      const utcTimestamp = new Date(unixSeconds * 1000).toISOString();
+      if (!utcTimestamp) {
+        return res.status(404).json({ message: "Invalid Timestamp" });
+      }
+
+      const modifiedVisits = await visitService.getModifiedVisits(id, utcTimestamp);
+      const deletedVisits = await visitService.getDeletedVisits(id, utcTimestamp);
+
+      if (!modifiedVisits && !deletedVisits) {
+        return res.status(404).json({ message: "Visit not found" });
+      }
+
+      return res.status(200).json({ modifiedVisits, deletedVisits });
     } catch (error) {
       logger.error("Error fetching visit:", error);
       return res.status(500).json({ message: "Internal server error" });

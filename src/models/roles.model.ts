@@ -12,7 +12,6 @@ class Role extends Model<InferAttributes<Role>, InferCreationAttributes<Role>> {
   declare id: CreationOptional<string>;
   declare name: string;
   declare slug: string;
-  declare createdAt: CreationOptional<Date>;
 
   public static initModel(sequelize: Sequelize): typeof Role {
     Role.init(
@@ -33,17 +32,13 @@ class Role extends Model<InferAttributes<Role>, InferCreationAttributes<Role>> {
           allowNull: false,
           unique: true,
         },
-        createdAt: {
-          type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW,
-          allowNull: false,
-          field: "created_at",
-        },
       },
       {
         sequelize,
         tableName: "roles",
-        timestamps: false,
+        timestamps: true,
+        underscored: true,
+        updatedAt: false,
         indexes: [
           {
             unique: true,

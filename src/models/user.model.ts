@@ -27,8 +27,6 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare role?: Role;
   declare organizations?: Organization[];
   declare resetPassToken?: string | null;
-  declare readonly createdAt: CreationOptional<Date>;
-  declare readonly updatedAt: CreationOptional<Date>;
 
   public async comparePassword(password: string): Promise<boolean> {
     return bcrypt.compare(password, this.password);
@@ -112,19 +110,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
         resetPassToken: {
           type: DataTypes.STRING,
           allowNull: true,
-          field: "reset_pass_token",
-        },
-        createdAt: {
-          type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW,
-          allowNull: false,
-          field: "created_at",
-        },
-        updatedAt: {
-          type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW,
-          allowNull: false,
-          field: "updated_at",
+          field: "reset_pass_token", 
         },
       },
       {
