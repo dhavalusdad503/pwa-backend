@@ -1,12 +1,10 @@
+import { ENV_CONFIG } from "@config/envConfig";
 import logger from "@utils/logger";
-import dotenv from "dotenv";
 import { Sequelize } from "sequelize";
 
-dotenv.config();
-
 // Create Sequelize instance
-export const sequelize = process.env.DATABASE_URL
-  ? new Sequelize(process.env.DATABASE_URL, {
+export const sequelize = ENV_CONFIG.DATABASE_URL
+  ? new Sequelize(ENV_CONFIG.DATABASE_URL, {
       dialect: "postgres",
       logging: process.env.NODE_ENV === "development" ? console.log : false,
       pool: {
@@ -17,13 +15,13 @@ export const sequelize = process.env.DATABASE_URL
       },
     })
   : new Sequelize(
-      process.env.DB_NAME || "",
-      process.env.DB_USER || "",
-      process.env.DB_PASSWORD || "",
+      ENV_CONFIG.DATABASE_CONFIG.DB_NAME,
+      ENV_CONFIG.DATABASE_CONFIG.USER,
+      ENV_CONFIG.DATABASE_CONFIG.PASSWORD,
       {
-        host: process.env.DB_HOST || "localhost",
+        host: ENV_CONFIG.DATABASE_CONFIG.HOST,
         dialect: "postgres",
-        logging: process.env.NODE_ENV === "development" ? console.log : false,
+        logging: ENV_CONFIG.NODE_ENV === "development" ? console.log : false,
         pool: {
           max: 5,
           min: 0,

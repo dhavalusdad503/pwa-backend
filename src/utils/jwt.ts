@@ -1,18 +1,18 @@
 import jwt, { SignOptions } from "jsonwebtoken";
 // import { AuthTokenPayload, InvitePayload } from '@features/auth/auth.types';
-import { JWT_CONFIG } from "@constants";
+import { ENV_CONFIG } from "@config/envConfig";
 import { AuthTokenPayload } from "@features/auth/auth.types";
 
 type ExpiresIn = SignOptions["expiresIn"];
 
-const JWT_SECRET = JWT_CONFIG.SECRET;
+const { JWT_SECRET_KEY } = ENV_CONFIG;
 
 export const createJWTToken = (
   payload: AuthTokenPayload,
   expiresIn: ExpiresIn = "24h"
 ): string => {
   const options: SignOptions = { expiresIn };
-  return jwt.sign(payload, JWT_SECRET, options);
+  return jwt.sign(payload, JWT_SECRET_KEY, options);
 };
 
 export const createJWTRefreshToken = (
@@ -20,11 +20,11 @@ export const createJWTRefreshToken = (
   expiresIn: ExpiresIn = "7d"
 ): string => {
   const options: SignOptions = { expiresIn };
-  return jwt.sign(payload, JWT_SECRET, options);
+  return jwt.sign(payload, JWT_SECRET_KEY, options);
 };
 
 export const verifyJWTToken = (token: string): AuthTokenPayload => {
-  return jwt.verify(token, JWT_SECRET) as AuthTokenPayload;
+  return jwt.verify(token, JWT_SECRET_KEY) as AuthTokenPayload;
 };
 
 export const decodeJWTToken = (token: string): AuthTokenPayload => {

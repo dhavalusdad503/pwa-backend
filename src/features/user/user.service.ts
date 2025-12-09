@@ -1,3 +1,7 @@
+import { UserRepository } from "@features/user";
+import { extractErrorMessage } from "@helper";
+import logger from "@utils/logger";
+import { Transaction } from "sequelize";
 import User from "../../models/user.model";
 import userRepository from "./user.repository";
 
@@ -58,6 +62,27 @@ class UserService implements IUserService {
   //   return { user, token };
   // }
 
+  async findUserByEmail(email: string, attributes?: string[]): Promise<User> {
+    const user = await userRepository.findByEmail(email, attributes);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return user;
+  }
+
+  async updateUserPassword(
+    userId: number,
+    password: string,
+    transaction?: Transaction
+  ): Promise<void> {
+    try {
+      await UserRepository.updateUserPassword(userId, password, transaction);
+    } catch (error) {
+      logger.error("Error in updateUserPassword service", error);
+      throw error;
+    }
+  }
+
   async updateUser(
     id: number,
     userData: { name?: string; email?: string }
@@ -72,6 +97,20 @@ class UserService implements IUserService {
     }
 
     return await userRepository.update(id, userData);
+  }
+
+  async getResetPasswordTokenUsingUserId(data: { user_id: string }) {
+    try {
+      const { user_id } = data;
+      const token = await userRepository.getResetPassTokenByUserId({ user_id });
+      return token;
+    } catch (error) {
+      const message = extractErrorMessage(
+        error,
+        "Error in getResetPasswordTokenUsingUserId service"
+      );
+      throw new Error(message);
+    }
   }
 
   async getUserById(id: number): Promise<User> {

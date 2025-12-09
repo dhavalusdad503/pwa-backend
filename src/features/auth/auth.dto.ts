@@ -23,6 +23,19 @@ export const refreshTokenSchema = Joi.object({
   refreshToken: joiCommon.joiString.required(),
 });
 
+export const forgotPasswordSchema = Joi.object({
+  email: joiCommon.joiEmail.required(),
+});
+
+export const validateTokenSchema = Joi.object({
+  token: joiCommon.joiString.required(),
+});
+
+export const resetPasswordSchema = Joi.object({
+  new_password: joiCommon.joiString.min(8).required(),
+  token: joiCommon.joiString,
+});
+
 export interface RegisterDto {
   firstName: string;
   lastName: string;
@@ -34,4 +47,46 @@ export interface RegisterDto {
 export interface LoginDto {
   email: string;
   password: string;
+}
+
+export interface SendResetPasswordDto {
+  id: string;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+}
+
+export interface TokenPayload {
+  id: string;
+  email: string;
+  tokenExpiryDate: Date;
+}
+
+export interface ResetPasswordDto {
+  token: string;
+  new_password: string;
+}
+
+export interface UpdatePasswordDto {
+  user_id: string;
+  password: string;
+}
+
+export interface ResponseUserDtc {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  email: string;
+  phone: string | null;
+  role: {
+    id: string;
+    name: string;
+    slug: string;
+  } | null;
+}
+
+export interface LoginResponseDto {
+  user: ResponseUserDtc;
+  token: string;
+  refreshToken: string;
 }

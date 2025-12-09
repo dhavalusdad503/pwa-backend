@@ -1,5 +1,6 @@
 import {
   CreateOptions,
+  DestroyOptions,
   FindOptions,
   Model,
   ModelStatic,
@@ -18,6 +19,11 @@ export interface IBaseRepository<T extends Model> {
   ): Promise<T>;
   delete(id: string | number): Promise<boolean>;
   count(options?: FindOptions): Promise<number>;
+  destroy(
+    where: FindOptions<T>["where"],
+    options?: DestroyOptions,
+    transaction?: Transaction
+  ): Promise<number>;
 }
 
 export abstract class BaseRepository<T extends Model>
@@ -53,14 +59,16 @@ export abstract class BaseRepository<T extends Model>
   async findOne(options: FindOptions): Promise<T | null> {
     return (await this.model.findOne(options)) as T | null;
   }
+
   async create(
     data: Partial<T["_creationAttributes"]>,
-    options?: CreateOptions
+    options?: CreateOptions,
+    transaction?: Transaction
   ): Promise<T> {
-    return (await this.model.create(
-      data as T["_creationAttributes"],
-      options
-    )) as T;
+    return await this.model.create(data as T["_creationAttributes"], {
+      ...options,
+      transaction,
+    });
   }
 
   async update(
@@ -75,8 +83,11 @@ export abstract class BaseRepository<T extends Model>
     return (await instance.update(data, { transaction })) as T;
   }
 
-  async delete(id: string | number): Promise<boolean> {
-    const instance = await this.model.findByPk(id);
+  async delete(
+    id: string | number,
+    transaction?: Transaction
+  ): Promise<boolean> {
+    const instance = await this.model.findByPk(id, { transaction });
     if (!instance) {
       return false;
     }
@@ -86,5 +97,32 @@ export abstract class BaseRepository<T extends Model>
 
   async count(options?: FindOptions): Promise<number> {
     return await this.model.count(options);
+  }
+
+  async destroy(
+    where: FindOptions<T>["where"],
+    options?: DestroyOptions,
+    transaction?: Transaction
+  ): Promise<number> {
+    return await this.model.destroy({
+      where,
+      ...options,
+      transaction,
+      individualHooks: true,
+    });
+  }
+
+  async findOrCreate(
+    where: FindOptions<T>["where"],
+    defaults: Partial<T["_creationAttributes"]>,
+    options?: CreateOptions,
+    transaction?: Transaction
+  ): Promise<[T, boolean]> {
+    return await this.model.findOrCreate({
+      where,
+      defaults: defaults as T["_creationAttributes"],
+      ...options,
+      transaction,
+    });
   }
 }

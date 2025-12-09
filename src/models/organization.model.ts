@@ -41,6 +41,11 @@ class Organization extends Model<
 
   public static associate(models: any): void {
     // No associations yet
+    Organization.belongsToMany(models.User, {
+      through: models.OrgUser,
+      foreignKey: "orgId",
+      as: "users",
+    });
   }
 }
 
