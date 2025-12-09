@@ -22,6 +22,17 @@ class VisitController {
     }
   }
 
+  async createMany(req: AuthRequest, res: Response): Promise<Response> {
+    try {
+      const visits = await visitService.createManyVisits(req.body, req.user);
+      const data = visits;
+      return successResponse(res, data, "Visit created successfully");
+    } catch (error) {
+      logger.error("Error creating visit:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
   async getAll(req: AuthRequest, res: Response): Promise<Response> {
     try {
       const { id } = req.user;
@@ -32,6 +43,7 @@ class VisitController {
       return res.status(500).json({ message: "Internal server error" });
     }
   }
+
 
   async getById(req: Request, res: Response): Promise<Response> {
     try {
@@ -52,7 +64,7 @@ class VisitController {
   async getUpdatedVisit(req: Request, res: Response): Promise<Response> {
     try {
       const { after } = req.params;
-      const { id } = {id: undefined};
+      const { id } = { id: undefined };
       const unixSeconds = Number(after);     // convert to number
       const utcTimestamp = new Date(unixSeconds * 1000).toISOString();
       if (!utcTimestamp) {

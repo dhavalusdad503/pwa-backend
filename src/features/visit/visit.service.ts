@@ -6,6 +6,7 @@ import { Op, Sequelize } from "sequelize";
 import Visit from "../../models/visit.model";
 import { CreateVisitDto, UpdateVisitDto } from "./visit.dto";
 import VisitRepository from "./visit.repository";
+import { AuthTokenPayload } from "@features/auth/auth.types";
 
 class VisitService {
   private visitRepository: typeof VisitRepository;
@@ -52,10 +53,65 @@ class VisitService {
       } else {
         createVisitData.patientId = findPatient?.id;
       }
-
       const visit = await this.visitRepository.create(createVisitData, { transaction });
       transaction.commit();
       return { id: visit?.id };
+    } catch (error) {
+      await transaction.rollback();
+      throw new Error(extractErrorMessage(error, "Error in creating Visit"));
+    }
+  }
+
+  async createManyVisits(visitData: CreateVisitDto[], user: AuthTokenPayload): Promise<{ id: string }[]> {
+
+    const caregiverId = user.id;
+
+    //assuming all visitData belongs to same orgName for single Api call.
+    const transaction = await sequelize.transaction();
+    try {
+      const organization = await this.orgRepository.findOne({
+        where: { name: visitData[0].orgName },
+      });
+
+      const visits = await Promise.all(
+        visitData.map(async (visit) => {
+          const findPatient = await this.patientRepository.findPatientByName(
+            visit?.patientName
+          );
+
+          let patientId;
+
+          if (!findPatient) {
+            const createPatient = await this.patientRepository.create(
+              {
+                name: visit?.patientName,
+                orgId: organization?.id,
+              },
+              { transaction }
+            );
+            patientId = createPatient?.id;
+          } else {
+            patientId = findPatient?.id;
+          }
+
+          return {
+            ...(visit.tempId && { tempId: visit.tempId }),
+            caregiverId: caregiverId,
+            notes: visit.notes,
+            serviceType: visit?.serviceType,
+            patientId: patientId,
+            startedAt: visit.startedAt,
+            endedAt: visit.endedAt,
+            submittedAt: visit.submittedAt,
+            orgId: organization?.id,
+          };
+        })
+      );
+
+      const result = await this.visitRepository.bulkCreate(visits, { transaction, returning: true });
+      transaction.commit();
+
+      return result.map((visit) => ({ id: visit.id, tempId: visit.tempId }));
     } catch (error) {
       await transaction.rollback();
       throw new Error(extractErrorMessage(error, "Error in creating Visit"));

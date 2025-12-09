@@ -21,6 +21,7 @@ class Visit extends Model<
   declare serviceType: string | null;
   declare address: string | null;
   declare notes: string | null;
+  declare tempId: number;
 
   public static initModel(sequelize: Sequelize): typeof Visit {
     Visit.init(
@@ -30,6 +31,10 @@ class Visit extends Model<
           defaultValue: DataTypes.UUIDV4,
           primaryKey: true,
           allowNull: false,
+        },
+        tempId: {
+          type: DataTypes.VIRTUAL,
+          allowNull: true,
         },
         orgId: {
           type: DataTypes.UUID,
