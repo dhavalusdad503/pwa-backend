@@ -21,6 +21,7 @@ export const updateVisitSchema = Joi.object({
 });
 
 export interface CreateVisitDto {
+  tempId?: number;
   // orgId: string;
   // caregiverId: string;
   // patientId: string;

@@ -13,8 +13,6 @@ class Organization extends Model<
 > {
   declare id: CreationOptional<string>;
   declare name: string;
-  declare createdAt: CreationOptional<Date>;
-  declare updatedAt: CreationOptional<Date>;
 
   public static initModel(sequelize: Sequelize): typeof Organization {
     Organization.init(
@@ -28,18 +26,6 @@ class Organization extends Model<
         name: {
           type: DataTypes.STRING,
           allowNull: false,
-        },
-        createdAt: {
-          type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW,
-          allowNull: false,
-          field: "created_at",
-        },
-        updatedAt: {
-          type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW,
-          allowNull: false,
-          field: "updated_at",
         },
       },
       {
@@ -55,6 +41,11 @@ class Organization extends Model<
 
   public static associate(models: any): void {
     // No associations yet
+    Organization.belongsToMany(models.User, {
+      through: models.OrgUser,
+      foreignKey: "orgId",
+      as: "users",
+    });
   }
 }
 

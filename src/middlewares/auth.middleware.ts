@@ -1,3 +1,5 @@
+import { ENV_CONFIG } from "@config/envConfig";
+import { AuthTokenPayload } from "@features/auth/auth.types";
 import { extractErrorInfo } from "@helper";
 import { verifyJWTToken as verifyToken } from "@utils/jwt";
 import logger from "@utils/logger";
@@ -5,13 +7,8 @@ import { errorResponse } from "@utils/responseHandler";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
-const SECRET_KEY = process.env.JWT_SECRET || "secret";
-
 export interface AuthRequest extends Request {
-  user: {
-    id: string;
-    email: string;
-  };
+  user: AuthTokenPayload;
 }
 
 export const authMiddleware = (
@@ -29,8 +26,8 @@ export const authMiddleware = (
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, SECRET_KEY);
-    req.user = decoded as { id: string; email: string };
+    const decoded = jwt.verify(token, ENV_CONFIG.JWT_SECRET_KEY);
+    req.user = decoded as AuthTokenPayload;
     next();
   } catch (error) {
     res.status(401).json({ message: "Unauthorized: Invalid token" });
@@ -53,6 +50,9 @@ export const verifyJWTTokenHelper = (req: AuthRequest, res: Response) => {
     req.user = {
       id: decoded.id,
       email: decoded.email,
+      role: decoded.role,
+      role_id: decoded.role_id,
+      org_id: decoded.org_id,
     };
 
     return req;
@@ -71,7 +71,7 @@ export const verifyJWTToken = (
   next: NextFunction
 ) => {
   try {
-    const isValid = verifyJWTTokenHelper(req, res);
+    const isValid = verifyJWTTokenHelper(req as AuthRequest, res);
 
     if (!isValid) {
       return;

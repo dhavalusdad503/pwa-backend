@@ -19,9 +19,9 @@ class Visit extends Model<
   declare endedAt: Date | null;
   declare submittedAt: Date | null;
   declare serviceType: string | null;
+  declare address: string | null;
   declare notes: string | null;
-  // declare createdAt: CreationOptional<Date>;
-  // declare updatedAt: CreationOptional<Date>;
+  declare tempId: number;
 
   public static initModel(sequelize: Sequelize): typeof Visit {
     Visit.init(
@@ -31,6 +31,10 @@ class Visit extends Model<
           defaultValue: DataTypes.UUIDV4,
           primaryKey: true,
           allowNull: false,
+        },
+        tempId: {
+          type: DataTypes.VIRTUAL,
+          allowNull: true,
         },
         orgId: {
           type: DataTypes.UUID,
@@ -82,29 +86,20 @@ class Visit extends Model<
           allowNull: true,
           field: "service_type",
         },
+        address: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
         notes: {
           type: DataTypes.TEXT,
           allowNull: true,
         },
-        // createdAt: {
-        //   type: DataTypes.DATE,
-        //   defaultValue: DataTypes.NOW,
-        //   allowNull: false,
-        //   field: "created_at",
-        // },
-        // updatedAt: {
-        //   type: DataTypes.DATE,
-        //   defaultValue: DataTypes.NOW,
-        //   allowNull: false,
-        //   field: "updated_at",
-        // },
       },
       {
         sequelize,
         tableName: "visits",
         timestamps: true,
-        createdAt: "created_at",
-        updatedAt: "updated_at",
+        paranoid: true,
         underscored: true,
       }
     );

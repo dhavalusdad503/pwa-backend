@@ -1,7 +1,7 @@
 import { AuthProvider, UserStatus } from "@enums";
+import Organization from "@models/organization.model";
 import Role from "@models/roles.model";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import {
   CreationOptional,
   DataTypes,
@@ -25,8 +25,8 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare authProvider: string;
   declare status: string;
   declare role?: Role;
-  declare readonly createdAt: CreationOptional<Date>;
-  declare readonly updatedAt: CreationOptional<Date>;
+  declare organizations?: Organization[];
+  declare resetPassToken?: string | null;
 
   public async comparePassword(password: string): Promise<boolean> {
     return bcrypt.compare(password, this.password);
@@ -107,17 +107,10 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
           defaultValue: AuthProvider.EMAIL,
           allowNull: false,
         },
-        createdAt: {
-          type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW,
-          allowNull: false,
-          field: "created_at",
-        },
-        updatedAt: {
-          type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW,
-          allowNull: false,
-          field: "updated_at",
+        resetPassToken: {
+          type: DataTypes.STRING,
+          allowNull: true,
+          field: "reset_pass_token", 
         },
       },
       {
@@ -142,6 +135,11 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     User.belongsTo(models.Role, {
       foreignKey: "roleId",
       as: "role",
+    });
+    User.belongsToMany(models.Organization, {
+      through: models.OrgUser,
+      foreignKey: "userId",
+      as: "organizations",
     });
   }
 }

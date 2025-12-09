@@ -19,10 +19,21 @@ export default class VisitRoute extends BaseRoute {
       // validationMiddleware(createVisitSchema),
       asyncHandler(visitController.create)
     );
+    this.router.post(
+      "/bulk-create",
+      verifyJWTToken,
+      // validationMiddleware(createVisitSchema),
+      asyncHandler(visitController.createMany)
+    );
     this.router.get(
       "/",
       verifyJWTToken,
       asyncHandler(visitController.getAll)
+    );
+    this.router.get(
+      "/updated/:after",
+      verifyJWTToken,
+      asyncHandler(visitController.getUpdatedVisit)
     );
     // this.router.get("/", verifyJWTToken, asyncHandler(visitController.getAll));
     // this.router.get("/:id", asyncHandler(visitController.getById));

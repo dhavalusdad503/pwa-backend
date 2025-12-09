@@ -1,4 +1,4 @@
-import { Role } from "@models";
+import { Organization, Role } from "@models";
 import { Transaction } from "sequelize";
 import User from "../../models/user.model";
 import { BaseRepository } from "../../repository/base.repository";
@@ -23,17 +23,51 @@ class UserRepository extends BaseRepository<User> implements IUserRepository {
     super(User);
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async getResetPassTokenByUserId(data: {
+    user_id: string;
+  }): Promise<string | null | undefined> {
+    const { user_id } = data;
+    const userData = await this.findOne({
+      where: { id: user_id },
+      attributes: ["resetPassToken"],
+    });
+    return userData?.resetPassToken;
+  }
+
+  async findByEmail(
+    email: string,
+    attributes?: string[]
+  ): Promise<User | null> {
     return await this.findOne({
       where: { email },
+      attributes,
     });
   }
 
   async findByEmailWithRole(email: string): Promise<User | null> {
     return await this.findOne({
       where: { email },
-      include: [{ model: Role, as: "role" }],
+      include: [
+        { model: Role, as: "role" },
+        {
+          model: Organization,
+          as: "organizations",
+          through: { attributes: [] },
+        },
+      ],
     });
+  }
+
+  async updateUserPassword(
+    id: string | number,
+    password: string,
+    transaction?: Transaction
+  ): Promise<User> {
+    return await this.update(
+      id,
+      { password, resetPassToken: null },
+      transaction
+    );
   }
 
   async dataExists(): Promise<boolean> {
