@@ -1,17 +1,17 @@
 import { Roles } from "@enums";
-import { UserRepository } from "@features/user";
+import userRepository from "@features/user/user.repository";
 import { extractErrorMessage } from "@helper";
 import { OrgUser, Role } from "@models";
 import { CommonPaginationOptionType, CommonPaginationResponse } from "@types";
 import logger from "@utils/logger";
-import { Transaction } from "sequelize";
+import { Op, Transaction } from "sequelize";
 import User from "../../models/user.model";
 
 class UserService {
-  private userRepository: typeof UserRepository;
+  private userRepository: typeof userRepository;
 
   constructor() {
-    this.userRepository = UserRepository;
+    this.userRepository = userRepository;
   }
 
   async findUserByEmail(email: string, attributes?: string[]): Promise<User> {
@@ -87,9 +87,20 @@ class UserService {
     params: CommonPaginationOptionType
   ): Promise<CommonPaginationResponse<User>> {
     try {
+      const { limit = 10, page = 1, sortColumn = 'createdAt', sortOrder = 'DESC', search = '' } = params;
+      const offset = (page - 1) * limit;
+
       const res =
-        await this.userRepository.findAllWithPaginationWithSortAndSearch({
-          ...params,
+        await this.userRepository.findAllWithPagination({
+          page: page,
+          limit: limit,
+          offset: offset,
+          order: sortColumn && sortOrder ? [[sortColumn, sortOrder]] : [['createdAt', 'DESC']],
+          where: {
+            firstName: { [Op.iLike]: `%${search}%` },
+            lastName: { [Op.iLike]: `%${search}%` },
+            email: { [Op.iLike]: `%${search}%` },
+          },
           attributes: ["id", "firstName", "lastName", "email", "phone"],
           include: [
             {

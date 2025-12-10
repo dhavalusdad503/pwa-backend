@@ -12,4 +12,5 @@ export interface CommonPaginationResponse<T> {
   total: number;
   page: number;
   limit: number;
+  hasMore?: boolean;
 }

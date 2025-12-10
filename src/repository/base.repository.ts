@@ -43,8 +43,7 @@ export interface IBaseRepository<T extends Model> {
 }
 
 export abstract class BaseRepository<T extends Model>
-  implements IBaseRepository<T>
-{
+  implements IBaseRepository<T> {
   protected model: ModelStatic<T>;
 
   constructor(model: ModelStatic<T>) {

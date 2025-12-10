@@ -3,6 +3,7 @@ import { extractErrorMessage } from "@helper";
 import { Organization, Patient } from "@models";
 import { CommonPaginationOptionType, CommonPaginationResponse } from "@types";
 import logger from "@utils/logger";
+import { Op } from "sequelize";
 
 class PatientService {
   private patientRepository: typeof PatientRepository;
@@ -19,9 +20,16 @@ class PatientService {
     params: CommonPaginationOptionType
   ): Promise<CommonPaginationResponse<Patient>> {
     try {
+      const { limit = 10, page = 1, sortColumn = 'createdAt', sortOrder = 'DESC', search = '' } = params;
+      const offset = (page - 1) * limit;
+
       const res =
-        await this.patientRepository.findAllWithPaginationWithSortAndSearch({
-          ...params,
+        await this.patientRepository.findAllWithPagination({
+          page: page,
+          limit: limit,
+          offset: offset,
+          order: sortColumn && sortOrder ? [[sortColumn, sortOrder]] : [['createdAt', 'DESC']],
+          where: { orgId: org_id, name: { [Op.iLike]: `%${search}%` } },
           attributes: ["id", "name", "primaryAddress"],
           include: [
             {
