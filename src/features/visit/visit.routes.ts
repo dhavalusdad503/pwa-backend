@@ -1,7 +1,5 @@
-import { Roles } from "@enums";
 import { asyncHandler } from "@helper";
 import { verifyJWTToken } from "@middlewares/auth.middleware";
-import { roleMiddleware } from "@middlewares/role.middleware";
 import { BaseRoute } from "@routes/base.routes";
 import visitController from "./visit.controller";
 
@@ -25,12 +23,6 @@ export default class VisitRoute extends BaseRoute {
       verifyJWTToken,
       // validationMiddleware(createVisitSchema),
       asyncHandler(visitController.createMany)
-    );
-    this.router.get(
-      "/list",
-      roleMiddleware([Roles.ADMIN, Roles.SUPERVISOR]),
-      verifyJWTToken,
-      asyncHandler(visitController.getAllVisitsByOrganization)
     );
     this.router.get(
       "/updated/:after",

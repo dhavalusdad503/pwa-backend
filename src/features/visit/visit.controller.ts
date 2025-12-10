@@ -1,4 +1,4 @@
-import { extractErrorInfo } from "@helper";
+import { Roles } from "@enums";
 import { AuthRequest } from "@middlewares/auth.middleware";
 import logger from "@utils/logger";
 import { paginationOption } from "@utils/paginationOption";
@@ -36,8 +36,35 @@ class VisitController {
 
   async getAll(req: AuthRequest, res: Response): Promise<Response> {
     try {
-      const { id } = req.user;
-      const visits = await visitService.getAllVisits(id);
+      const { id, role, org_id } = req.user;
+
+      if (!role) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      if (!org_id) {
+        return errorResponse(res, "Organization not found", 404);
+      }
+
+      let visits;
+
+
+      switch (role) {
+        case Roles.CAREGIVER:
+          visits = await visitService.getAllVisits(id);
+          break;
+        case Roles.SUPERVISOR:
+          visits = await visitService.getAllVisitsByOrganization(
+            org_id,
+            paginationOption(req.query)
+          );
+          break;
+        case Roles.ADMIN:
+          break;
+        default:
+          return res.status(401).json({ message: "Unauthorized" });
+      }
+
       return successResponse(res, visits, "Visit fetch successfully");
     } catch (error) {
       logger.error("Error fetching visits:", error);
@@ -147,31 +174,6 @@ class VisitController {
     }
   }
 
-  async getAllVisitsByOrganization(
-    req: AuthRequest,
-    res: Response
-  ): Promise<Response> {
-    try {
-      const { org_id } = req.user;
-
-      if (!org_id) {
-        return errorResponse(res, "Organization not found", 404);
-      }
-
-      const visits = await visitService.getAllVisitsByOrganization(
-        org_id,
-        paginationOption(req.query)
-      );
-      return successResponse(res, visits, "Visit fetch successfully");
-    } catch (error) {
-      logger.error("Error in getAllVisits controller", error);
-      const { message, status } = extractErrorInfo(
-        error,
-        "Internal server error"
-      );
-      return errorResponse(res, message, status);
-    }
-  }
 }
 
 export default new VisitController();
