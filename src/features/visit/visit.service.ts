@@ -1,12 +1,15 @@
+import { AuthTokenPayload } from "@features/auth/auth.types";
 import { OrgRepository } from "@features/organization";
 import { PatientRepository } from "@features/patient";
+import { VisitRepository } from "@features/visit";
 import { extractErrorMessage } from "@helper";
-import { Patient, sequelize } from "@models";
+import { Patient, sequelize, User } from "@models";
+import { CommonPaginationOptionType, CommonPaginationResponse } from "@types";
+import logger from "@utils/logger";
+import moment from "moment";
 import { Op, Sequelize } from "sequelize";
 import Visit from "../../models/visit.model";
 import { CreateVisitDto, UpdateVisitDto } from "./visit.dto";
-import VisitRepository from "./visit.repository";
-import { AuthTokenPayload } from "@features/auth/auth.types";
 
 class VisitService {
   private visitRepository: typeof VisitRepository;
@@ -185,6 +188,81 @@ class VisitService {
 
   async getVisitsByPatient(patientId: string): Promise<Visit[]> {
     return await this.visitRepository.findAll({ where: { patientId } });
+  }
+
+  async getAllVisitsByOrganization(
+    orgId: string,
+    params: CommonPaginationOptionType & {
+      caregiverId?: string;
+      patientId?: string;
+      startDate?: string;
+      endDate?: string;
+    }
+  ): Promise<CommonPaginationResponse<Visit>> {
+    try {
+      const { limit = 10, page = 1, sortColumn = 'createdAt', sortOrder = 'DESC', search = '' } = params;
+      const offset = (page - 1) * limit;
+
+      const where: Record<string, any> = { orgId, serviceType: { [Op.iLike]: `%${search}%` }, notes: { [Op.iLike]: `%${search}%` } };
+
+      // -------- Dynamic Filters --------
+      if (params.caregiverId) {
+        where.caregiverId = params.caregiverId;
+      }
+
+      if (params.patientId) {
+        where.patientId = params.patientId;
+      }
+
+      if (params.startDate || params.endDate) {
+        where.createdAt = {};
+
+        const startDateTime = params.startDate
+          ? moment(params.startDate).startOf('day').toDate()
+          : undefined;
+
+        const endDateTime = params.endDate
+          ? moment(params.endDate).endOf('day').toDate()
+          : undefined;
+
+        if (startDateTime && endDateTime) {
+          where.createdAt[Op.between] = [startDateTime, endDateTime];
+        } else if (startDateTime) {
+          where.createdAt[Op.gte] = startDateTime;
+        } else if (endDateTime) {
+          where.createdAt[Op.lte] = endDateTime;
+        }
+
+      }
+
+      const res =
+        await this.visitRepository.findAllWithPagination({
+          page: page,
+          limit: limit,
+          offset: offset,
+          order: sortColumn && sortOrder ? [[sortColumn, sortOrder]] : [['createdAt', 'DESC']],
+          where,
+          attributes: { exclude: ["caregiverId", "patientId"] },
+          include: [
+            {
+              model: Patient,
+              as: "patient",
+              attributes: ['id', 'name']
+            },
+            {
+              model: User,
+              as: "caregiver",
+              attributes: ['id', 'firstName', 'lastName']
+            }
+          ]
+        });
+
+      return res;
+    } catch (error) {
+      logger.error("Error in getAllVisitsByOrganization controller", error);
+      const message = extractErrorMessage(error, "Internal server error");
+      throw new Error(message);
+    }
   }
 }
 

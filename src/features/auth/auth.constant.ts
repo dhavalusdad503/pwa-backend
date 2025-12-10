@@ -6,6 +6,8 @@ export const AUTH_MESSAGES = {
     "Your current and previous password could not be same",
   INVALID_TOKEN: "Invalid Token",
   PASSWORD_RESET: "Password reset successfully",
+  INVALID_EMAIL_OR_PASSWORD: "Invalid email or password",
+  DEFAULT_ORG_NOT_FOUND: "Default organization not found",
 };
 
 export const STATUS = {
@@ -15,3 +17,4 @@ export const STATUS = {
 
 export const RESET_PASS_TOKEN_EXPIRY_MINUTES = 5;
 export const REDIS_RESET_PASSWORD_KEY_PREFIX = "reset_password_token";
+export const DEFAULT_ORG_NAME = "organization1";

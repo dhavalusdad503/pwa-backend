@@ -1,6 +1,8 @@
+import { Roles } from "@enums";
 import { AuthRequest } from "@middlewares/auth.middleware";
 import logger from "@utils/logger";
-import { successResponse } from "@utils/responseHandler";
+import { paginationOption } from "@utils/paginationOption";
+import { errorResponse, successResponse } from "@utils/responseHandler";
 import { Request, Response } from "express";
 import visitService from "./visit.service";
 
@@ -12,9 +14,8 @@ class VisitController {
         ...req.user,
       });
       const data = {
-       id: visit.id,
-       
-      }
+        id: visit.id,
+      };
       return successResponse(res, data, "Visit created successfully");
     } catch (error) {
       logger.error("Error creating visit:", error);
@@ -35,8 +36,35 @@ class VisitController {
 
   async getAll(req: AuthRequest, res: Response): Promise<Response> {
     try {
-      const { id } = req.user;
-      const visits = await visitService.getAllVisits(id);
+      const { id, role, org_id } = req.user;
+
+      if (!role) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      if (!org_id) {
+        return errorResponse(res, "Organization not found", 404);
+      }
+
+      let visits;
+
+
+      switch (role) {
+        case Roles.CAREGIVER:
+          visits = await visitService.getAllVisits(id);
+          break;
+        case Roles.SUPERVISOR:
+          visits = await visitService.getAllVisitsByOrganization(
+            org_id,
+            paginationOption(req.query)
+          );
+          break;
+        case Roles.ADMIN:
+          break;
+        default:
+          return res.status(401).json({ message: "Unauthorized" });
+      }
+
       return successResponse(res, visits, "Visit fetch successfully");
     } catch (error) {
       logger.error("Error fetching visits:", error);
@@ -145,6 +173,7 @@ class VisitController {
       return res.status(500).json({ message: "Internal server error" });
     }
   }
+
 }
 
 export default new VisitController();

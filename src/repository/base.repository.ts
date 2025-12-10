@@ -1,9 +1,12 @@
 import {
+  AggregateOptions,
   CreateOptions,
   DestroyOptions,
   FindOptions,
   Model,
   ModelStatic,
+  Op,
+  Order,
   Transaction,
 } from "sequelize";
 
@@ -24,11 +27,23 @@ export interface IBaseRepository<T extends Model> {
     options?: DestroyOptions,
     transaction?: Transaction
   ): Promise<number>;
+  findAllWithPagination(
+    options?: FindOptions &
+      AggregateOptions<T> & {
+        page?: number;
+        limit?: number;
+      }
+  ): Promise<{
+    data: T[];
+    total: number;
+    page: number;
+    limit: number;
+    hasMore: boolean;
+  }>;
 }
 
 export abstract class BaseRepository<T extends Model>
-  implements IBaseRepository<T>
-{
+  implements IBaseRepository<T> {
   protected model: ModelStatic<T>;
 
   constructor(model: ModelStatic<T>) {
@@ -124,5 +139,110 @@ export abstract class BaseRepository<T extends Model>
       ...options,
       transaction,
     });
+  }
+
+  async findAllWithPagination(
+    options?: FindOptions &
+      AggregateOptions<T> & {
+        page?: number;
+        limit?: number;
+      }
+  ): Promise<{
+    data: T[];
+    total: number;
+    page: number;
+    limit: number;
+    hasMore: boolean;
+  }> {
+    const { page = 1, limit = 10 } = options as {
+      page?: number;
+      limit?: number;
+    };
+
+    const { rows: data, count } = await this.model.findAndCountAll({
+      ...options,
+      distinct: true,
+      // col: 'id',
+    });
+    let total = 0;
+    if (Array.isArray(count)) {
+      total = count.length;
+    } else {
+      total = count;
+    }
+
+    const hasMore = total > page * limit;
+    return { data, total, page, limit, hasMore };
+  }
+
+  async findAllWithPaginationWithSortAndSearch(
+    options?: FindOptions & {
+      page?: number;
+      limit?: number;
+      search?: string;
+      sortColumn?: string;
+      sortOrder?: string;
+      searchableFields?: string[];
+    }
+  ): Promise<{
+    data: T[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const {
+      page = 1,
+      limit = 10,
+      sortColumn,
+      sortOrder,
+      search = "",
+      searchableFields = [],
+      where,
+      include,
+      attributes,
+      paranoid,
+    } = options || {};
+
+    const offset = (page - 1) * limit;
+
+    const order: Order = this.sortOrder(sortColumn, sortOrder) as Order;
+    const finalWhere = {
+      ...where,
+      ...this.searchedData(search, searchableFields),
+    };
+
+    const { rows: data, count: total } = await this.model.findAndCountAll({
+      limit,
+      offset,
+      order,
+      where: finalWhere,
+      include,
+      attributes,
+      paranoid,
+      distinct: true,
+    });
+
+    return { data, total, page: Number(page), limit: Number(page) };
+  }
+
+  protected sortOrder(sortColumn?: string, sortOrder?: string) {
+    if (!sortColumn && !sortOrder) return undefined;
+    return [[sortColumn, sortOrder]];
+  }
+
+  protected searchedData(search: string, searchableFields?: string[]) {
+    if (!search) return {};
+    // const searchableFields = ["firstName", "lastName", "phone", "email"];
+    let searchField;
+    if (searchableFields?.length) {
+      searchField = searchableFields;
+    } else {
+      searchField = ["firstName", "lastName", "phone", "email"];
+    }
+    return {
+      [Op.or]: searchField?.map((field) => ({
+        [field]: { [Op.iLike]: `%${search}%` },
+      })),
+    };
   }
 }

@@ -1,4 +1,4 @@
-export { default as authController } from "./auth.controller";
+export { default as AuthController } from "./auth.controller";
 export * from "./auth.dto";
-export { default as authRoutes } from "./auth.routes";
-export { default as authService } from "./auth.service";
+export { default as AuthRoutes } from "./auth.routes";
+export { default as AuthService } from "./auth.service";

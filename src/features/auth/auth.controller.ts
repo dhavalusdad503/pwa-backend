@@ -1,5 +1,5 @@
 import { AUTH_MESSAGES, STATUS } from "@features/auth/auth.constant";
-import { userService } from "@features/user";
+import { UserService } from "@features/user";
 import { extractErrorInfo } from "@helper";
 import { decrypt } from "@utils";
 import { createJWTToken, verifyJWTToken } from "@utils/jwt";
@@ -38,14 +38,19 @@ class AuthController {
       });
 
       return successResponse(res, newUser, "User registered successfully");
-    } catch (error: any) {
-      return errorResponse(res, error.message || "Error registering user");
+    } catch (error) {
+      logger.error("Error registering user", error);
+      const { message, status } = extractErrorInfo(
+        error,
+        "Internal server error"
+      );
+      errorResponse(res, message, status);
     }
   }
 
   async login(req: Request, res: Response) {
     try {
-      const { email, password } = req.body;
+      const { email, password, org_id } = req.body;
 
       if (!email || !password) {
         return errorResponse(res, "Email and password are required", 400);
@@ -54,6 +59,7 @@ class AuthController {
       const { user, token, refreshToken } = await authService.login({
         email,
         password,
+        org_id,
       });
 
       return successResponse(
@@ -61,8 +67,13 @@ class AuthController {
         { token, refreshToken, user },
         "Login successful"
       );
-    } catch (error: any) {
-      return errorResponse(res, error.message || "Error logging in");
+    } catch (error) {
+      logger.error("Error logging in user", error);
+      const { message, status } = extractErrorInfo(
+        error,
+        "Internal server error"
+      );
+      errorResponse(res, message, status);
     }
   }
 
@@ -93,9 +104,10 @@ class AuthController {
         );
       }
     } catch (error) {
+      logger.error("Error validating refresh token schema", error);
       const { message, status } = extractErrorInfo(
         error,
-        "Error validating refresh token schema"
+        "Internal server error"
       );
       errorResponse(res, message, status);
     }
@@ -104,7 +116,7 @@ class AuthController {
   async forgotPassword(req: Request, res: Response) {
     try {
       const { email } = req.body;
-      const user = await userService.findUserByEmail(email, [
+      const user = await UserService.findUserByEmail(email, [
         "id",
         "email",
         "firstName",
@@ -134,7 +146,7 @@ class AuthController {
       logger.error("Error in forgotPassword controller", error);
       const { message, status } = extractErrorInfo(
         error,
-        "Error in forgotPassword controller"
+        "Internal server error"
       );
       return errorResponse(res, message, status);
     }
@@ -155,7 +167,7 @@ class AuthController {
         return errorResponse(res, AUTH_MESSAGES.INVALID_TOKEN, 400);
       }
 
-      const storeToken = await userService.getResetPasswordTokenUsingUserId({
+      const storeToken = await UserService.getResetPasswordTokenUsingUserId({
         user_id: tokenObj?.id,
       });
 
@@ -176,7 +188,7 @@ class AuthController {
       logger.error("Error in validateToken controller", error);
       const { message, status } = extractErrorInfo(
         error,
-        "Error in validateToken controller"
+        "Internal server error"
       );
       return errorResponse(res, message, status);
     }
@@ -196,7 +208,7 @@ class AuthController {
       logger.error("Error in resetPassword controller", error);
       const { message, status } = extractErrorInfo(
         error,
-        "Error in resetPassword controller"
+        "Internal server error"
       );
       return errorResponse(res, message, status);
     }

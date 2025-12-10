@@ -47,6 +47,7 @@ export interface RegisterDto {
 export interface LoginDto {
   email: string;
   password: string;
+  org_id?: string;
 }
 
 export interface SendResetPasswordDto {
@@ -72,7 +73,7 @@ export interface UpdatePasswordDto {
   password: string;
 }
 
-export interface ResponseUserDtc {
+export interface ResponseUserDto {
   id: string;
   firstName: string | null;
   lastName: string | null;
@@ -86,7 +87,7 @@ export interface ResponseUserDtc {
 }
 
 export interface LoginResponseDto {
-  user: ResponseUserDtc;
+  user: ResponseUserDto;
   token: string;
   refreshToken: string;
 }

@@ -1,52 +1,13 @@
+import { extractErrorInfo } from "@helper";
+import { AuthRequest } from "@middlewares/auth.middleware";
+import logger from "@utils/logger";
+import { paginationOption } from "@utils/paginationOption";
 import { Request, Response } from "express";
 import { sequelize } from "../../database/db";
 import { errorResponse, successResponse } from "../../utils/responseHandler";
 import userService from "./user.service";
 
 class UserController {
-  // async createUser(req: Request, res: Response) {
-  //   try {
-  //     const { username, email, password } = req.body;
-
-  //     const missingFields = [];
-  //     if (!username) missingFields.push("Username");
-  //     if (!email) missingFields.push("Email");
-  //     if (!password) missingFields.push("Password");
-
-  //     if (missingFields.length > 0) {
-  //       return errorResponse(
-  //         res,
-  //         `${missingFields.join(", ")} ${
-  //           missingFields.length > 1 ? "are" : "is"
-  //         } required`,
-  //         400
-  //       );
-  //     }
-
-  //     const newUser = await userService.registerUser({
-  //       name: username,
-  //       email,
-  //       password
-  //     });
-
-  //     return successResponse(res, newUser, "User created successfully");
-  //   } catch (error: any) {
-  //     return errorResponse(res, error.message || "Error creating user");
-  //   }
-  // }
-
-  // async loginUser(req: Request, res: Response) {
-  //   try {
-  //     const { email, password } = req.body;
-
-  //     const { user, token } = await userService.loginUser(email, password);
-
-  //     return successResponse(res, { token }, "Login successful");
-  //   } catch (error: any) {
-  //     return errorResponse(res, error.message || "Error logging in user");
-  //   }
-  // }
-
   async updateUser(req: Request, res: Response) {
     const transaction = await sequelize.transaction();
     try {
@@ -62,7 +23,12 @@ class UserController {
       return successResponse(res, updatedUser, "User updated successfully");
     } catch (error: any) {
       await transaction.rollback();
-      return errorResponse(res, error.message || "Error updating user");
+      logger.error("Error in updateUser controller", error);
+      const { message, status } = extractErrorInfo(
+        error,
+        "Internal server error"
+      );
+      return errorResponse(res, message, status);
     }
   }
 
@@ -74,7 +40,12 @@ class UserController {
 
       return successResponse(res, user, "User fetched successfully");
     } catch (error: any) {
-      return errorResponse(res, error.message || "Error fetching user");
+      logger.error("Error in getUserById controller", error);
+      const { message, status } = extractErrorInfo(
+        error,
+        "Internal server error"
+      );
+      return errorResponse(res, message, status);
     }
   }
 
@@ -90,15 +61,39 @@ class UserController {
 
       return successResponse(res, null, "User deleted successfully");
     } catch (error: any) {
-      return errorResponse(res, error.message || "Error deleting user");
+      logger.error("Error in deleteUser controller", error);
+      const { message, status } = extractErrorInfo(
+        error,
+        "Internal server error"
+      );
+      return errorResponse(res, message, status);
     }
   }
 
-  async test(req: Request, res: Response) {
+  async caregiverList(req: AuthRequest, res: Response) {
     try {
-      return successResponse(res, null, "test successfully");
+      const { org_id } = req.user;
+
+      if (!org_id) {
+        return errorResponse(res, "Organization not found", 404);
+      }
+
+      const getAllCaregivers = await userService.getAllCaregivers(
+        org_id,
+        paginationOption(req.query)
+      );
+      return successResponse(
+        res,
+        getAllCaregivers,
+        "Caregiver fetch successfully"
+      );
     } catch (error: any) {
-      return errorResponse(res, error.message || "Error fetching user");
+      logger.error("Error in caregiverList controller", error);
+      const { message, status } = extractErrorInfo(
+        error,
+        "Internal server error"
+      );
+      return errorResponse(res, message, status);
     }
   }
 }
