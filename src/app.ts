@@ -3,6 +3,7 @@ import logger from "@utils/logger";
 import { ENV_CONFIG } from "@config/envConfig";
 import cors from "cors";
 import express from "express";
+import path from "path";
 import { sequelize } from "./database/db";
 import { initModels } from "./models";
 import { BaseRoute } from "./routes/base.routes";
@@ -28,6 +29,10 @@ export default class App {
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
       })
+    );
+    this.app.use(
+      '/uploads',
+      express.static(path.join(__dirname, '..', 'uploads'))
     );
   }
 

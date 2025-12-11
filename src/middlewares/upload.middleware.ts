@@ -18,9 +18,9 @@ const storage = multer.diskStorage({
                 uploadPath = path.join(process.cwd(), "uploads", "users", "admin");
                 break;
             default:
-                uploadPath = path.join(process.cwd(), "uploads", "others");
+                uploadPath = path.join(process.cwd(), "uploads", "other");
         }
-        // uploadPath = path.join(process.cwd(), "uploads", "others");
+        // uploadPath = path.join(process.cwd(), "uploads", "other");
         if (!fs.existsSync(uploadPath)) {
             fs.mkdirSync(uploadPath, { recursive: true });
         }

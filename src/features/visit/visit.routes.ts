@@ -18,7 +18,7 @@ export default class VisitRoute extends BaseRoute {
       "/create",
       verifyJWTToken,
       uploadFile.single('image'),
-      validationMiddleware(createVisitSchema),
+      // validationMiddleware(createVisitSchema),
       asyncHandler(visitController.create)
     );
     this.router.get("/", verifyJWTToken, asyncHandler(visitController.getAll));
