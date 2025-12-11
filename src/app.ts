@@ -42,7 +42,7 @@ export default class App {
       await sequelize.authenticate();
       logger.info("✅ Database connection established successfully.");
 
-      this.app.listen(this.port, "0.0.0.0", () => {
+      this.app.listen(this.port, () => {
         logger.info(`🚀 Server is running at http://localhost:${this.port}`);
       });
     } catch (error) {
