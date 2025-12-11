@@ -70,30 +70,31 @@ class UserController {
     }
   }
 
-  async caregiverList(req: AuthRequest, res: Response) {
+  async getAll(req: AuthRequest, res: Response) {
     try {
-      const { org_id } = req.user;
+      const { org_id, role } = req.user;
+
+      if (!role) {
+        return errorResponse(res, "Unauthorized access", 401);
+      }
 
       if (!org_id) {
         return errorResponse(res, "Organization not found", 404);
       }
 
-      const getAllCaregivers = await userService.getAllCaregivers(
+      const getAllUsers = await userService.getAllUsers(
         org_id,
+        role,
         paginationOption(req.query)
       );
       return successResponse(
         res,
-        getAllCaregivers,
-        "Caregiver fetch successfully"
+        getAllUsers,
+        "User fetch successfully"
       );
     } catch (error: any) {
-      logger.error("Error in caregiverList controller", error);
-      const { message, status } = extractErrorInfo(
-        error,
-        "Internal server error"
-      );
-      return errorResponse(res, message, status);
+      logger.error("Error in usersList controller", error);
+      return errorResponse(res, "Internal server error", 500);
     }
   }
 }

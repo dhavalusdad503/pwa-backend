@@ -12,10 +12,10 @@ export default class UserRoute extends BaseRoute {
 
   protected initializeRoutes(): void {
     this.router.get(
-      "/caregiver",
+      "/",
       roleMiddleware([Roles.ADMIN, Roles.SUPERVISOR]),
       verifyJWTToken,
-      asyncHandler(userController.caregiverList)
+      asyncHandler(userController.getAll)
     );
     // this.router.put("/:userId", asyncHandler(userController.updateUser));
     // this.router.get("/:userId", asyncHandler(userController.getUserById));

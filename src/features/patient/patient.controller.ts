@@ -38,11 +38,7 @@ class PatientController {
       return successResponse(res, visits, "Patient fetch successfully");
     } catch (error) {
       logger.error("Error in getAllPatients controller", error);
-      const { message, status } = extractErrorInfo(
-        error,
-        "Internal server error"
-      );
-      return errorResponse(res, message, status);
+      return errorResponse(res, "Internal server error", 500);
     }
   }
 }
