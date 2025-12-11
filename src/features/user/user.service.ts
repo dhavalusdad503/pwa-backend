@@ -1,9 +1,11 @@
 import { Roles } from "@enums";
 import userRepository from "@features/user/user.repository";
+import usersFieldsMap from "@features/user/utils";
 import { extractErrorMessage } from "@helper";
 import { OrgUser, Role } from "@models";
 import { CommonPaginationOptionType, CommonPaginationResponse } from "@types";
 import { buildSelectedColumns } from "@utils";
+import { buildDynamicQuery } from "@utils/dynamicFieldsQueryBuilder";
 import logger from "@utils/logger";
 import { Op, Transaction } from "sequelize";
 import User from "../../models/user.model";
@@ -102,10 +104,70 @@ class UserService {
 
       const defaultColumns = ["id", "firstName", "lastName", "email", "phone", "createdAt", "updatedAt"];
 
+      const where = {
+        firstName: { [Op.iLike]: `%${search}%` },
+        lastName: { [Op.iLike]: `%${search}%` },
+        email: { [Op.iLike]: `%${search}%` },
+      }
+
       const selectedColumns = buildSelectedColumns({
         columns: params.columns,
         defaultColumns: defaultColumns
       })
+
+      const dynamicQuery = buildDynamicQuery(
+        usersFieldsMap,
+        defaultColumns,
+        params.columns,
+        {
+          page,
+          limit,
+          offset,
+          order: sortColumn && sortOrder ? [[sortColumn, sortOrder]] : [['createdAt', 'DESC']],
+          where
+        }
+      )
+
+      if (!dynamicQuery.include) {
+        dynamicQuery.include = [];
+      }
+
+      const includeArray = Array.isArray(dynamicQuery.include)
+        ? dynamicQuery.include
+        : [dynamicQuery.include];
+
+      // Add or update userOrgs association
+      let userOrgsInclude: any = includeArray.find((inc: any) => inc.as === 'userOrgs');
+      if (!userOrgsInclude) {
+        userOrgsInclude = {
+          model: OrgUser,
+          as: 'userOrgs',
+          attributes: [],
+          required: true
+        };
+        includeArray.push(userOrgsInclude);
+      }
+      userOrgsInclude.where = { orgId };
+      userOrgsInclude.required = true;
+
+      // Add or update role association
+      let roleInclude: any = includeArray.find((inc: any) => inc.as === 'role');
+      if (!roleInclude) {
+        roleInclude = {
+          model: Role,
+          as: 'role',
+          attributes: [],
+          required: true
+        };
+        includeArray.push(roleInclude);
+      }
+      roleInclude.where = params.userType
+        ? { slug: params.userType.toUpperCase() }
+        : { slug: Roles.CAREGIVER };
+      roleInclude.required = true;
+
+      // Update dynamicQuery with the modified include array
+      dynamicQuery.include = includeArray;
 
       const res =
         await this.userRepository.findAllWithPagination({
@@ -113,11 +175,7 @@ class UserService {
           limit: limit,
           offset: offset,
           order: sortColumn && sortOrder ? [[sortColumn, sortOrder]] : [['createdAt', 'DESC']],
-          where: {
-            firstName: { [Op.iLike]: `%${search}%` },
-            lastName: { [Op.iLike]: `%${search}%` },
-            email: { [Op.iLike]: `%${search}%` },
-          },
+          where,
           attributes: selectedColumns,
           include: [
             {

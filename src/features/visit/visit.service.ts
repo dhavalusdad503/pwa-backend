@@ -2,9 +2,11 @@ import { AuthTokenPayload } from "@features/auth/auth.types";
 import { OrgRepository } from "@features/organization";
 import { PatientRepository } from "@features/patient";
 import { VisitRepository } from "@features/visit";
+import visitFieldsMap from "@features/visit/utils";
 import { extractErrorMessage } from "@helper";
-import { Patient, sequelize, User } from "@models";
+import { Patient, sequelize } from "@models";
 import { CommonPaginationOptionType, CommonPaginationResponse } from "@types";
+import { buildDynamicQuery } from "@utils/dynamicFieldsQueryBuilder";
 import logger from "@utils/logger";
 import moment from "moment";
 import { Op, Sequelize } from "sequelize";
@@ -217,13 +219,16 @@ class VisitService {
       patientId?: string;
       startDate?: string;
       endDate?: string;
-    }
+      columns?: string[];
+    },
   ): Promise<CommonPaginationResponse<Visit>> {
     try {
       const { limit = 10, page = 1, sortColumn = 'createdAt', sortOrder = 'DESC', search = '' } = params;
       const offset = (page - 1) * limit;
 
       const where: Record<string, any> = { orgId, serviceType: { [Op.iLike]: `%${search}%` }, notes: { [Op.iLike]: `%${search}%` } };
+
+      const defaultColumns = ['id', 'startedAt', 'endedAt', 'serviceType', 'notes', 'address', 'patientName', 'caregiverName'];
 
       // -------- Dynamic Filters --------
       if (params.caregiverId) {
@@ -255,27 +260,20 @@ class VisitService {
 
       }
 
-      const res =
-        await this.visitRepository.findAllWithPagination({
-          page: page,
-          limit: limit,
-          offset: offset,
+      const dynamicQuery = buildDynamicQuery(
+        visitFieldsMap,
+        defaultColumns,
+        params.columns,
+        {
+          page,
+          limit,
+          offset,
           order: sortColumn && sortOrder ? [[sortColumn, sortOrder]] : [['createdAt', 'DESC']],
           where,
-          attributes: { exclude: ["caregiverId", "patientId"] },
-          include: [
-            {
-              model: Patient,
-              as: "patient",
-              attributes: ['id', 'name']
-            },
-            {
-              model: User,
-              as: "caregiver",
-              attributes: ['id', 'firstName', 'lastName']
-            }
-          ]
-        });
+        }
+      );
+      const res =
+        await this.visitRepository.findAllWithPagination(dynamicQuery);
 
       return res;
     } catch (error) {

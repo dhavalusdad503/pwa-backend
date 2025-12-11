@@ -61,18 +61,17 @@ class VisitController {
         case Roles.CAREGIVER:
           visits = await visitService.getAllVisits(id);
           break;
+
         case Roles.SUPERVISOR:
+        case Roles.ADMIN:
           visits = await visitService.getAllVisitsByOrganization(
             org_id,
-            paginationOption(req.query)
+            paginationOption(req.query),
           );
-          break;
-        case Roles.ADMIN:
           break;
         default:
           return res.status(401).json({ message: "Unauthorized" });
       }
-
       return successResponse(res, visits, "Visit fetch successfully");
     } catch (error) {
       logger.error("Error fetching visits:", error);
