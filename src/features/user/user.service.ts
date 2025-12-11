@@ -3,6 +3,7 @@ import userRepository from "@features/user/user.repository";
 import { extractErrorMessage } from "@helper";
 import { OrgUser, Role } from "@models";
 import { CommonPaginationOptionType, CommonPaginationResponse } from "@types";
+import { buildSelectedColumns } from "@utils";
 import logger from "@utils/logger";
 import { Op, Transaction } from "sequelize";
 import User from "../../models/user.model";
@@ -82,13 +83,29 @@ class UserService {
     return await this.userRepository.delete(id);
   }
 
-  async getAllCaregivers(
+  async getAllUsers(
     orgId: string,
-    params: CommonPaginationOptionType
+    role: string,
+    params: CommonPaginationOptionType & {
+      userType?: string
+      columns?: string | string[]
+    }
   ): Promise<CommonPaginationResponse<User>> {
     try {
       const { limit = 10, page = 1, sortColumn = 'createdAt', sortOrder = 'DESC', search = '' } = params;
       const offset = (page - 1) * limit;
+
+
+      if (role === Roles.SUPERVISOR && params.userType?.toUpperCase() === Roles.SUPERVISOR) {
+        params.userType = Roles.CAREGIVER;
+      }
+
+      const defaultColumns = ["id", "firstName", "lastName", "email", "phone", "createdAt", "updatedAt"];
+
+      const selectedColumns = buildSelectedColumns({
+        columns: params.columns,
+        defaultColumns: defaultColumns
+      })
 
       const res =
         await this.userRepository.findAllWithPagination({
@@ -101,7 +118,7 @@ class UserService {
             lastName: { [Op.iLike]: `%${search}%` },
             email: { [Op.iLike]: `%${search}%` },
           },
-          attributes: ["id", "firstName", "lastName", "email", "phone"],
+          attributes: selectedColumns,
           include: [
             {
               model: OrgUser,
@@ -114,7 +131,7 @@ class UserService {
               model: Role,
               required: true,
               as: "role",
-              where: { slug: Roles.CAREGIVER },
+              where: { ...(params.userType ? { slug: params?.userType?.toUpperCase() } : { slug: Roles.CAREGIVER }) },
               attributes: [],
             },
           ],
@@ -122,7 +139,7 @@ class UserService {
 
       return res;
     } catch (error) {
-      logger.error("Error in getAllCaregivers service", error);
+      logger.error("Error in getAllUsers service", error);
       const message = extractErrorMessage(error, "Internal server error");
       throw new Error(message);
     }

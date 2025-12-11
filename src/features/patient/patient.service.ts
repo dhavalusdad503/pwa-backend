@@ -47,7 +47,7 @@ class PatientService {
       logger.error("Error in getAllPatients service", error);
       const message = extractErrorMessage(
         error,
-        "Error in getAllCaregivers service"
+        "Error in getAllPatients service"
       );
       throw new Error(message);
     }

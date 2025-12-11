@@ -39,7 +39,7 @@ class VisitController {
       const { id, role, org_id } = req.user;
 
       if (!role) {
-        return res.status(401).json({ message: "Unauthorized" });
+        return errorResponse(res, "Unauthorized access", 401);
       }
 
       if (!org_id) {
@@ -68,7 +68,7 @@ class VisitController {
       return successResponse(res, visits, "Visit fetch successfully");
     } catch (error) {
       logger.error("Error fetching visits:", error);
-      return res.status(500).json({ message: "Internal server error" });
+      return errorResponse(res, "Internal server error", 500);
     }
   }
 

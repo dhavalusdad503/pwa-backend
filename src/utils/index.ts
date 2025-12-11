@@ -33,3 +33,30 @@ export const combineName = ({
 
   return names.filter((name) => name).join(" ") || "-";
 };
+
+
+export const buildSelectedColumns = ({
+  columns,
+  defaultColumns = ["id", "createdAt", "updatedAt"],
+}: {
+  columns?: string | string[],
+  defaultColumns: string[]
+}): string[] => {
+  if (!columns) return defaultColumns;
+
+  let cols: string[] = [];
+
+  if (Array.isArray(columns)) {
+    cols = [...columns];
+  }
+
+  else {
+    cols = [columns];
+  }
+
+  if (!cols.includes("id")) cols.push("id");
+  if (!cols.includes("createdAt")) cols.push("createdAt");
+  if (!cols.includes("updatedAt")) cols.push("updatedAt");
+
+  return [...new Set(cols)];
+};
