@@ -1,6 +1,9 @@
+import { createVisitSchema } from "@features/visit/visit.dto";
 import { asyncHandler } from "@helper";
 import { verifyJWTToken } from "@middlewares/auth.middleware";
+import uploadFile from "@middlewares/upload.middleware";
 import { BaseRoute } from "@routes/base.routes";
+import { validationMiddleware } from "@utils/validationMiddleware";
 import visitController from "./visit.controller";
 
 export default class VisitRoute extends BaseRoute {
@@ -14,13 +17,15 @@ export default class VisitRoute extends BaseRoute {
     this.router.post(
       "/create",
       verifyJWTToken,
-      // validationMiddleware(createVisitSchema),
+      uploadFile.single('image'),
+      validationMiddleware(createVisitSchema),
       asyncHandler(visitController.create)
     );
     this.router.get("/", verifyJWTToken, asyncHandler(visitController.getAll));
     this.router.post(
       "/bulk-create",
       verifyJWTToken,
+      uploadFile.any(),
       // validationMiddleware(createVisitSchema),
       asyncHandler(visitController.createMany)
     );

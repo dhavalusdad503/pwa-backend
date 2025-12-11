@@ -22,7 +22,15 @@ class Visit extends Model<
   declare address: string | null;
   declare notes: string | null;
   declare tempId: number;
-
+  declare latitude: number;
+  declare longitude: number;
+  declare attestation: boolean;
+  declare attestationName: string;
+  declare followUp: boolean;
+  declare clientPresent: boolean;
+  declare medicationReviewed: boolean;
+  declare safetyCheck: boolean;
+  declare filePath: string;
   public static initModel(sequelize: Sequelize): typeof Visit {
     Visit.init(
       {
@@ -94,6 +102,53 @@ class Visit extends Model<
           type: DataTypes.TEXT,
           allowNull: true,
         },
+        latitude: {
+          type: DataTypes.DECIMAL(10, 8),
+          allowNull: true,
+        },
+        longitude: {
+          type: DataTypes.DECIMAL(11, 8),
+          allowNull: true,
+        },
+        attestation: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+        },
+        attestationName: {
+          type: DataTypes.STRING,
+          field: "attestation_name",
+
+          allowNull: false,
+        },
+        clientPresent: {
+          type: DataTypes.BOOLEAN,
+          allowNull: true,
+          field: "client_present",
+          defaultValue: false
+        },
+        followUp: {
+          type: DataTypes.BOOLEAN,
+          allowNull: true,
+          field: "follow_up",
+          defaultValue: false
+        },
+        medicationReviewed: {
+          type: DataTypes.BOOLEAN,
+          allowNull: true,
+          field: "medication_reviewed",
+          defaultValue: false
+        },
+        safetyCheck: {
+          type: DataTypes.BOOLEAN,
+          allowNull: true,
+          field: "safety_check",
+          defaultValue: false
+        },
+        filePath: {
+          type: DataTypes.STRING,
+          allowNull: true,
+          field: "file_path"
+        }
       },
       {
         sequelize,

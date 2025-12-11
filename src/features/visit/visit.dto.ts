@@ -2,13 +2,22 @@ import { joiCommon } from "@helper/joi-schema.helper";
 import Joi from "joi";
 
 export const createVisitSchema = Joi.object({
-  patientName: joiCommon.joiString.required(),
   startedAt: joiCommon.joiDate.optional(),
   endedAt: joiCommon.joiDate.optional(),
-  serviceType: joiCommon.joiString.optional(),
   notes: joiCommon.joiString.optional(),
-  address: joiCommon.joiString.optional(),
+  serviceType: joiCommon.joiString.optional(),
   submittedAt: joiCommon.joiDate.optional(),
+  address: joiCommon.joiString.optional(),
+  patientName: joiCommon.joiString.required(),
+  attestation: joiCommon.joiBoolean.required(),
+  attestationName: joiCommon.joiString.required(),
+  followUp: joiCommon.joiBoolean.optional(),
+  clientPresent: joiCommon.joiBoolean.optional(),
+  safetyCheck: joiCommon.joiBoolean.optional(),
+  medicationReviewed: joiCommon.joiBoolean.optional(),
+  latitude: joiCommon.joiNumber.optional(),
+  longitude: joiCommon.joiNumber.optional(),
+  orgName: joiCommon.joiString.required()
 });
 
 export const updateVisitSchema = Joi.object({
@@ -21,23 +30,25 @@ export const updateVisitSchema = Joi.object({
 });
 
 export interface CreateVisitDto {
-  tempId?: number;
-  // orgId: string;
-  // caregiverId: string;
-  // patientId: string;
-  // startedAt?: Date;
-  // endedAt?: Date;
-  submittedAt?: Date;
-  // serviceType?: string;
-  // notes?: string;
-  patientName: string;
   startedAt: Date;
   endedAt: Date;
-  serviceType: string;
-  notes: string;
+  tempId?: number;
   address: string;
+  attestation: boolean;
+  followUp: boolean;
+  clientPresent: boolean
+  medicationReviewed: boolean
+  safetyCheck: boolean
+  latitude: number;
+  longitude: number;
+  patientName: string;
+  notes: string;
+  serviceType: string;
+  submittedAt?: Date;
   id: string;
-  orgName: string; 
+  orgName: string;
+  filePath: string;
+  attestationName: string;
 }
 
 export interface UpdateVisitDto {

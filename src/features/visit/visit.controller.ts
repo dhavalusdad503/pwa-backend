@@ -1,4 +1,6 @@
 import { Roles } from "@enums";
+import { CreateVisitDto } from "@features/visit/visit.dto";
+import { parseBulkFormData } from "@helper/bulkInsertHelper";
 import { AuthRequest } from "@middlewares/auth.middleware";
 import logger from "@utils/logger";
 import { paginationOption } from "@utils/paginationOption";
@@ -9,9 +11,12 @@ import visitService from "./visit.service";
 class VisitController {
   async create(req: AuthRequest, res: Response): Promise<Response> {
     try {
+      const file = req.file;
+      const filePath = `/uploads/other/${file?.filename}`
       const visit = await visitService.createVisit({
         ...req.body,
         ...req.user,
+        filePath
       });
       const data = {
         id: visit.id,
@@ -25,7 +30,10 @@ class VisitController {
 
   async createMany(req: AuthRequest, res: Response): Promise<Response> {
     try {
-      const visits = await visitService.createManyVisits(req.body, req.user);
+      const combinedData = parseBulkFormData<CreateVisitDto>(req.body, req.files);
+
+      const visits = await visitService.createManyVisits(combinedData, req.user);
+
       const data = visits;
       return successResponse(res, data, "Visit created successfully");
     } catch (error) {

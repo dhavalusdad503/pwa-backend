@@ -24,14 +24,24 @@ class VisitService {
 
   async createVisit(visitData: CreateVisitDto): Promise<{ id: string }> {
     let createVisitData = {
+      startedAt: visitData.startedAt,
+      endedAt: visitData.endedAt,
       caregiverId: visitData.id,
       notes: visitData.notes,
       serviceType: visitData?.serviceType,
       patientId: "",
-      startedAt: visitData.startedAt,
-      endedAt: visitData.endedAt,
       submittedAt: visitData.submittedAt,
       orgId: "",
+      address: visitData?.address,
+      attestation: visitData?.attestation,
+      followUp: visitData?.followUp,
+      clientPresent: visitData?.clientPresent,
+      safetyCheck: visitData?.safetyCheck,
+      medicationReviewed: visitData?.medicationReviewed,
+      latitude: visitData?.latitude,
+      longitude: visitData?.longitude,
+      filePath: visitData?.filePath,
+      attestationName: visitData?.attestationName
     };
     const transaction = await sequelize.transaction();
     try {
@@ -107,6 +117,16 @@ class VisitService {
             endedAt: visit.endedAt,
             submittedAt: visit.submittedAt,
             orgId: organization?.id,
+            address: visit?.address,
+            attestation: visit?.attestation,
+            followUp: visit?.followUp,
+            clientPresent: visit?.clientPresent,
+            safetyCheck: visit?.safetyCheck,
+            medicationReviewed: visit?.medicationReviewed,
+            latitude: visit?.latitude,
+            longitude: visit?.longitude,
+            filePath: visit?.filePath,
+            attestationName: visit?.attestationName
           };
         })
       );
