@@ -31,9 +31,9 @@ export class Patient {
   updatedAt: Date;
 
   // ---------- Relations ----------
-  //   @ManyToOne(() => Organization, (organization) => organization.patients, {
-  //     onDelete: 'CASCADE',
-  //   })
+  @ManyToOne(() => Organization, (organization) => organization.patients, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'org_id' })
   organization: Organization;
 }

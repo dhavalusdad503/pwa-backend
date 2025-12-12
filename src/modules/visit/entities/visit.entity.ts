@@ -59,6 +59,9 @@ export class Visit {
   @Column({ type: 'text' })
   notes: string;
 
+  // @Column({ type: 'text' })
+  // address: string;
+
   @Column({
     type: 'decimal',
     name: 'latitude',

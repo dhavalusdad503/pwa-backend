@@ -25,7 +25,7 @@ dotenv.config();
       username: process.env.DB_USER || 'postgres',
       database: process.env.DB_NAME || 'test',
       password: process.env.DB_PASSWORD || 'Dev@root',
-      synchronize: true,
+      // synchronize: true,
       entities: [User, Visit, Organization, OrgUser, Role, Patient],
       logging: true,
     }),

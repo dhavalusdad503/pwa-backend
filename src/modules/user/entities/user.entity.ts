@@ -76,13 +76,12 @@ export class User {
   updatedAt: Date;
 
   // ---------- Relations ----------
-
   @ManyToOne(() => Role, (role) => role.users, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'role_id' })
   role: Role;
 
   @OneToMany(() => OrgUser, (orgUser) => orgUser.user)
-  userOrgs: OrgUser[];
+  userOrgs: OrgUser[]; // Change this to `userOrgs`
 
   @ManyToMany(() => Organization, (org) => org.users)
   @JoinTable({
@@ -91,5 +90,4 @@ export class User {
     inverseJoinColumn: { name: 'org_id', referencedColumnName: 'id' },
   })
   organizations: Organization[];
-  orgUsers: any;
 }

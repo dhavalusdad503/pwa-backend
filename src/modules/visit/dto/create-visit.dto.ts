@@ -9,12 +9,15 @@ import {
 
 export class CreateVisitDto {
   // Foreign Keys
+  @IsOptional()
   @IsUUID()
   orgId: string;
 
+  @IsOptional()
   @IsUUID()
   caregiverId: string;
 
+  @IsOptional()
   @IsUUID()
   patientId: string;
 
@@ -80,4 +83,10 @@ export class CreateVisitDto {
   @IsOptional()
   @IsNumber()
   tempId?: number;
+
+  @IsString()
+  orgName: string;
+
+  @IsUUID()
+  id: string;
 }

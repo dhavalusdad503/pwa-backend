@@ -11,10 +11,7 @@ export class OrgUser {
   orgId: string;
 
   // ----- RELATIONS -----
-
-  //   @ManyToOne(() => User, (user) => user.orgUsers, {
-  //     onDelete: 'CASCADE',
-  //   })
+  @ManyToOne(() => User, (user) => user.userOrgs, { onDelete: 'CASCADE' }) // Update this to match the property name `userOrgs`
   @JoinColumn({ name: 'user_id' })
   user: User;
 

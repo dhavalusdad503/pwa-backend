@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { OrgUser } from '../../org-user/entities/org-user.entity';
 import { User } from 'src/modules/user/entities/user.entity';
+import { Patient } from 'src/modules/patient/entities/patient.entity';
 
 @Entity({ name: 'organizations' })
 export class Organization {
@@ -41,4 +42,6 @@ export class Organization {
     inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
   })
   users: User[];
+  @OneToMany(() => Patient, (patient) => patient.organization)
+  patients: Patient[];
 }
