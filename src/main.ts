@@ -12,7 +12,7 @@ async function bootstrap() {
       transform: true, // Auto-transform types
     }),
   );
-  app.useGlobalFilters(new AllExceptionsFilter());
+  // app.useGlobalFilters(new AllExceptionsFilter());
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
