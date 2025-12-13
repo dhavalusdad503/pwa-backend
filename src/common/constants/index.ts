@@ -4,6 +4,14 @@ export enum Roles {
   ADMIN = 'ADMIN',
 }
 
+export const UserRoleSlugs: Record<Roles, string> = {
+  [Roles.SUPERVISOR]: 'SUPERVISOR',
+  [Roles.ADMIN]: 'ADMIN',
+  [Roles.CAREGIVER]: 'CAREGIVER',
+};
+
+export const DEFAULT_ORGANIZATION_NAME = 'Default Organization';
+
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',

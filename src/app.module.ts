@@ -8,27 +8,32 @@ import { RolesModule } from './modules/roles/roles.module';
 import { PatientModule } from './modules/patient/patient.module';
 import { OrganizationModule } from './modules/organization/organization.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './modules/user/entities/user.entity';
-import { Visit } from './modules/visit/entities/visit.entity';
-import { Organization } from './modules/organization/entities/organization.entity';
-import { OrgUser } from './modules/org-user/entities/org-user.entity';
-import { Role } from './modules/roles/entities/role.entity';
-import { Patient } from './modules/patient/entities/patient.entity';
-import * as dotenv from 'dotenv';
-dotenv.config();
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { configStore } from './config/app.config';
+import { IDbOptions } from './config/type-orm/options';
+import { generateDataSourceOptions } from './config/type-orm/type-orm.config';
+import { Entities } from './config/type-orm/entities';
+
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      port: Number(process.env.DB_PORT) || 5432,
-      username: process.env.DB_USER || 'postgres',
-      database: process.env.DB_NAME || 'test',
-      password: process.env.DB_PASSWORD || 'Dev@root',
-      // synchronize: true,
-      entities: [User, Visit, Organization, OrgUser, Role, Patient],
-      logging: true,
+    ConfigModule.forRoot({
+      load: [configStore],
+      isGlobal: true,
     }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => {
+        const opts = configService.get<IDbOptions>('database');
+        return {
+          ...generateDataSourceOptions(opts),
+          autoLoadEntities: true,
+          retryAttempts: 3,
+          retryDelay: 3000,
+        };
+      },
+      inject: [ConfigService],
+    }),
+    TypeOrmModule.forFeature([...Entities]),
     AuthModule,
     VisitModule,
     OrganizationModule,

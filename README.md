@@ -31,6 +31,29 @@
 $ npm install
 ```
 
+## Migration All Command (Generate,create,up,down,drop-schema)
+
+```bash
+$ npm run migration:generate --name=yourMigrationName  # Direct entity file generate migration
+$ npm run migration:create --name=yourMigrationName  # Blank file generate for migration
+$ npm run migration:up  # Migration up
+$ npm run migration:down # Latest migration revert
+$ npm run schema:drop # Whole schema drop
+```
+
+## Seeder Command
+
+```bash
+$ npm run seed:run # All seeder run this cmd
+```
+
+## Nest js All Resource Generate Command (Module,Controller,Service,Dto,Entity)
+
+```bash
+$ npm run resource:generate --name=yourModuleName # All seeder run this cmd
+# Also using nest other cli https://docs.nestjs.com/cli/usages
+```
+
 ## Compile and run the project
 
 ```bash
