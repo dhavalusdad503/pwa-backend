@@ -4,6 +4,7 @@ import { Role } from '@/modules/roles/entities/role.entity';
 import { User } from '@/modules/user/entities/user.entity';
 import { Roles, UserRoleSlugs, UserStatus } from '@/common/constants';
 import bcrypt from 'bcrypt';
+import { SeederLogger } from '.';
 
 export class UserSeeder implements Seeder {
   name = 'UserSeeder';
@@ -14,13 +15,13 @@ export class UserSeeder implements Seeder {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      console.log('Seeding users...');
+      SeederLogger.log('Seeding users...');
       const roleRepository = queryRunner.manager.getRepository(Role);
       const userRepository = queryRunner.manager.getRepository(User);
       const userCount = await userRepository.count();
 
       if (userCount > 0) {
-        console.log('Users already exist, skipping creation...');
+        SeederLogger.log('Users already exist, skipping creation...');
         return;
       }
 
@@ -36,7 +37,7 @@ export class UserSeeder implements Seeder {
       );
 
       if (!adminRole || !supervisorRole || !caregiverRole) {
-        console.log('Required roles not found, skipping users seeding...');
+        SeederLogger.log('Required roles not found, skipping users seeding...');
         return;
       }
 
@@ -71,10 +72,10 @@ export class UserSeeder implements Seeder {
       await userRepository.save(users);
       await queryRunner.commitTransaction();
 
-      console.log('Users seeded successfully!');
+      SeederLogger.log('Users seeded successfully!');
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      console.log('Error seeding users:', error);
+      SeederLogger.error('Error seeding users:', error);
       throw error;
     } finally {
       await queryRunner.release();

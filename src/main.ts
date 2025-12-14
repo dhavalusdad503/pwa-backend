@@ -1,10 +1,22 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { AllExceptionFilter } from './common/filters/all-exceptions.filter';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { AppLogger } from './common/logger/app.logger';
 
 async function bootstrap() {
   try {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, { bufferLogs: true });
+
+    // Enable CORS
+    app.enableCors({
+      origin: '*',
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+    });
+
+    // Global Validation
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true, // Remove unwanted fields
@@ -12,14 +24,25 @@ async function bootstrap() {
         transform: true, // Auto-transform types
       }),
     );
-    // app.useGlobalFilters(new AllExceptionsFilter());
+
+    // Global Prefix all api starting with /api
+    app.setGlobalPrefix('api');
+
+    // Global Interceptors & Filters (response, exception)
+    app.useGlobalInterceptors(new ResponseInterceptor());
+    app.useGlobalFilters(new AllExceptionFilter());
+
+    // Create Logger
+    const logger = app.get(AppLogger);
+    app.useLogger(logger);
+
     await app.listen(process.env.PORT ?? 3000, () => {
-      console.log(
+      logger.log(
         `🚀 Server is running at http://localhost:${process.env.PORT}`,
       );
     });
   } catch (error) {
-    console.log('❌ Failed to start server:', error);
+    new AppLogger('bootstrap').error('❌ Failed to start server:', error);
     process.exit(1);
   }
 }

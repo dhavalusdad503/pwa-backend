@@ -24,3 +24,9 @@ export enum AuthProvider {
   GITHUB = 'github',
   TWITTER = 'twitter',
 }
+
+export const TEMPLATE_NAME = {
+  FORGOT_PASSWORD: 'forgotPassword',
+};
+
+export const LOGGER_CONTEXT = 'App';

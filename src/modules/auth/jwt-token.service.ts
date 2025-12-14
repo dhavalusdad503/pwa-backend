@@ -1,14 +1,11 @@
 // src/auth/jwt-token.service.ts
 import { Injectable } from '@nestjs/common';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
+import { AuthTokenPayload } from '../../common/types';
 
 export type ExpiresIn = JwtSignOptions['expiresIn'];
 
 // Adapt this to your real payload type
-export interface AuthTokenPayload {
-  email: string;
-  role: string;
-}
 
 @Injectable()
 export class JwtTokenService {
@@ -34,6 +31,6 @@ export class JwtTokenService {
     return this.jwtService.verify<AuthTokenPayload>(token);
   }
   decodeJWTToken(token: string): AuthTokenPayload | null {
-    return this.jwtService.decode(token) as AuthTokenPayload | null;
+    return this.jwtService.decode(token);
   }
 }

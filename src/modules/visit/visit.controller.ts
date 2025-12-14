@@ -8,22 +8,13 @@ import {
   Patch,
   Param,
   Delete,
-  UseInterceptors,
-  UploadedFile,
   Req,
   HttpException,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateVisitDto } from './dto/create-visit.dto';
 import { Roles } from 'src/common/constants';
+import { AuthTokenPayload } from '@/common/types';
 
-export interface AuthTokenPayload {
-  id: string;
-  email: string;
-  role?: Roles;
-  role_id: string;
-  org_id?: string;
-}
 export interface AuthRequest extends Request {
   user: AuthTokenPayload;
 }

@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import { Seeder } from './seeder.interface';
 import { Organization } from '@/modules/organization/entities/organization.entity';
 import { DEFAULT_ORGANIZATION_NAME } from '@/common/constants';
+import { SeederLogger } from '.';
 
 export class OrganizationSeeder implements Seeder {
   name = 'OrganizationSeeder';
@@ -12,14 +13,14 @@ export class OrganizationSeeder implements Seeder {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      console.log('Seeding organizations...');
+      SeederLogger.log('Seeding organizations...');
 
       const organizationRepository =
         queryRunner.manager.getRepository(Organization);
       const organizationCount = await organizationRepository.count();
 
       if (organizationCount > 0) {
-        console.log('Organizations already exist, skipping creation...');
+        SeederLogger.log('Organizations already exist, skipping creation...');
         return;
       }
 
@@ -27,10 +28,10 @@ export class OrganizationSeeder implements Seeder {
       await organizationRepository.save(defaultOrganization);
       await queryRunner.commitTransaction();
 
-      console.log('Organizations seeded successfully!');
+      SeederLogger.log('Organizations seeded successfully!');
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      console.log('Error seeding organizations:', error);
+      SeederLogger.error('Error seeding organizations:', error);
       throw error;
     } finally {
       await queryRunner.release();

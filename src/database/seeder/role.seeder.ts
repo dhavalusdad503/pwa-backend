@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import { Seeder } from './seeder.interface';
 import { Role } from '@/modules/roles/entities/role.entity';
 import { Roles, UserRoleSlugs } from '@/common/constants';
+import { SeederLogger } from '.';
 
 export class RoleSeeder implements Seeder {
   name = 'RoleSeeder';
@@ -12,12 +13,12 @@ export class RoleSeeder implements Seeder {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      console.log('Seeding roles...');
+      SeederLogger.log('Seeding roles...');
       const roleRepository = queryRunner.manager.getRepository(Role);
       const roleCount = await roleRepository.count();
 
       if (roleCount > 0) {
-        console.log('Roles already exist, skipping creation...');
+        SeederLogger.log('Roles already exist, skipping creation...');
         return;
       }
       const defaultRoles = [
@@ -38,10 +39,10 @@ export class RoleSeeder implements Seeder {
       await roleRepository.save(defaultRoles);
       await queryRunner.commitTransaction();
 
-      console.log('Roles seeded successfully!');
+      SeederLogger.log('Roles seeded successfully!');
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      console.log('Error seeding roles:', error);
+      SeederLogger.error('Error seeding roles:', error);
       throw error;
     } finally {
       await queryRunner.release();

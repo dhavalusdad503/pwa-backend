@@ -3,11 +3,11 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { Entities } from './entities';
 import { parseInt } from 'src/common/utils';
-import { IDbOptions } from './options';
+import { IDbOptions } from '@/common/types';
 
 const DB_PORT = 5432;
 const MAX_POOL_SIZE = 100;
-const CONNECTION_TIMEOUT_MILLIS = 1000;
+// const CONNECTION_TIMEOUT_MILLIS = 1000;
 
 export const generateDataSourceOptions = (
   options?: IDbOptions,
@@ -30,7 +30,7 @@ export const generateDataSourceOptions = (
       // max connection pool size
       max: MAX_POOL_SIZE,
       // connection timeout
-      connectionTimeoutMillis: CONNECTION_TIMEOUT_MILLIS,
+      // connectionTimeoutMillis: CONNECTION_TIMEOUT_MILLIS,
     },
   };
   return dataSource;

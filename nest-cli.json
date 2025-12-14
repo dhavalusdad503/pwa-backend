@@ -7,7 +7,7 @@
     "tsConfigPath": "tsconfig.build.json",
     "assets": [
       {
-        "include": "**/*.hbs",
+        "include": "**/**/**/*.hbs",
         "watchAssets": true
       }
     ]

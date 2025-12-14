@@ -4,6 +4,7 @@ import { OrgUser } from '@/modules/org-user/entities/org-user.entity';
 import { Organization } from '@/modules/organization/entities/organization.entity';
 import { User } from '@/modules/user/entities/user.entity';
 import { DEFAULT_ORGANIZATION_NAME } from '@/common/constants';
+import { SeederLogger } from '.';
 
 export class OrgUsersSeeder implements Seeder {
   name = 'OrgUsersSeeder';
@@ -14,7 +15,7 @@ export class OrgUsersSeeder implements Seeder {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      console.log('Seeding organization users...');
+      SeederLogger.log('Seeding organization users...');
 
       const orgUserRepository = queryRunner.manager.getRepository(OrgUser);
       const organizationRepository =
@@ -23,7 +24,9 @@ export class OrgUsersSeeder implements Seeder {
       const organizationList = await orgUserRepository.count();
 
       if (organizationList > 0) {
-        console.log('Organization users already exist, skipping creation...');
+        SeederLogger.log(
+          'Organization users already exist, skipping creation...',
+        );
         return;
       }
       const organization = await organizationRepository.findOne({
@@ -31,7 +34,7 @@ export class OrgUsersSeeder implements Seeder {
       });
 
       if (!organization) {
-        console.log(
+        SeederLogger.log(
           'Organization not found, skipping organization users seeding...',
         );
         return;
@@ -39,7 +42,7 @@ export class OrgUsersSeeder implements Seeder {
 
       const users = await userRepository.find();
       if (users.length === 0) {
-        console.log('No users found to assign to organization...');
+        SeederLogger.log('No users found to assign to organization...');
         return;
       }
 
@@ -50,10 +53,10 @@ export class OrgUsersSeeder implements Seeder {
 
       await orgUserRepository.save(orgUsers);
       await queryRunner.commitTransaction();
-      console.log('Organization users seeded successfully!');
+      SeederLogger.log('Organization users seeded successfully!');
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      console.log('Error seeding organization users:', error);
+      SeederLogger.error('Error seeding organization users:', error);
       throw error;
     } finally {
       await queryRunner.release();

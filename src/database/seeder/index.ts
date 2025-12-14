@@ -1,4 +1,7 @@
+import { AppLogger } from '@/common/logger/app.logger';
 import { SeederManager } from './seeder.manager';
+
+export const SeederLogger = new AppLogger('Seeder');
 
 async function main() {
   try {
@@ -14,7 +17,7 @@ async function main() {
 
     process.exit(0);
   } catch (error) {
-    console.log('Seeding failed:', error);
+    SeederLogger.error('Seeding failed:', error);
     process.exit(1);
   }
 }

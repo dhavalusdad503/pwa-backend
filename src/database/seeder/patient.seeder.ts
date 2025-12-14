@@ -3,6 +3,7 @@ import { Seeder } from './seeder.interface';
 import { Patient } from '@/modules/patient/entities/patient.entity';
 import { Organization } from '@/modules/organization/entities/organization.entity';
 import { DEFAULT_ORGANIZATION_NAME } from '@/common/constants';
+import { SeederLogger } from '.';
 
 export class PatientSeeder implements Seeder {
   name = 'PatientSeeder';
@@ -13,14 +14,14 @@ export class PatientSeeder implements Seeder {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      console.log('Seeding patients...');
+      SeederLogger.log('Seeding patients...');
       const patientRepository = queryRunner.manager.getRepository(Patient);
       const organizationRepository =
         queryRunner.manager.getRepository(Organization);
       const patientCount = await patientRepository.count();
 
       if (patientCount > 0) {
-        console.log('Patients already exist, skipping creation...');
+        SeederLogger.log('Patients already exist, skipping creation...');
         return;
       }
 
@@ -29,7 +30,9 @@ export class PatientSeeder implements Seeder {
       });
 
       if (!organization) {
-        console.log('Organization not found, skipping patients seeding...');
+        SeederLogger.log(
+          'Organization not found, skipping patients seeding...',
+        );
         return;
       }
 
@@ -42,10 +45,10 @@ export class PatientSeeder implements Seeder {
       await patientRepository.save(defaultPatients);
       await queryRunner.commitTransaction();
 
-      console.log('Patients seeded successfully!');
+      SeederLogger.log('Patients seeded successfully!');
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      console.log('Error seeding patients:', error);
+      SeederLogger.error('Error seeding patients:', error);
       throw error;
     } finally {
       await queryRunner.release();

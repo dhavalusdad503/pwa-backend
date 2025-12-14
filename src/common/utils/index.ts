@@ -11,5 +11,16 @@ export const parseInt = (
   if (trimmed === '') return undefined;
 
   const parsed = Number.parseInt(trimmed, 10);
+
   return Number.isNaN(parsed) ? undefined : parsed;
+};
+
+export const successResponse = <T>(
+  data: T,
+  defaultMessage: string = 'Success',
+) => {
+  return {
+    data: { ...data },
+    message: defaultMessage,
+  };
 };
