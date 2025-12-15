@@ -16,6 +16,10 @@ async function bootstrap() {
       allowedHeaders: ['Content-Type', 'Authorization'],
     });
 
+    // Create Logger
+    const logger = app.get(AppLogger);
+    app.useLogger(logger);
+
     // Global Validation
     app.useGlobalPipes(
       new ValidationPipe({
@@ -30,11 +34,7 @@ async function bootstrap() {
 
     // Global Interceptors & Filters (response, exception)
     app.useGlobalInterceptors(new ResponseInterceptor());
-    app.useGlobalFilters(new AllExceptionFilter());
-
-    // Create Logger
-    const logger = app.get(AppLogger);
-    app.useLogger(logger);
+    app.useGlobalFilters(new AllExceptionFilter(logger));
 
     await app.listen(process.env.PORT ?? 3000, () => {
       logger.log(
@@ -42,7 +42,7 @@ async function bootstrap() {
       );
     });
   } catch (error) {
-    new AppLogger('bootstrap').error('❌ Failed to start server:', error);
+    console.error('❌ Failed to start server:', error);
     process.exit(1);
   }
 }

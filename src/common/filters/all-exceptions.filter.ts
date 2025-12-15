@@ -6,19 +6,25 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { QueryFailedError } from 'typeorm';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { PostgresDriverError } from '../interface/error.interface';
+import { AppLogger } from '../logger/app.logger';
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter<unknown> {
+  constructor(private readonly logger: AppLogger) {}
+
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
 
     const response = ctx.getResponse<Response>();
-    // const request = ctx.getRequest<Request>();
+    const request = ctx.getRequest<Request>();
 
     const status = this.getStatus(exception);
     const message = this.getMessage(exception);
+
+    // ✅ LOG FULL ERROR (server-side)
+    this.logException(exception, request, status);
 
     response.status(status).json({
       success: false,
@@ -118,5 +124,45 @@ export class AllExceptionFilter implements ExceptionFilter<unknown> {
 
   private capitalize(value: string): string {
     return value.charAt(0).toUpperCase() + value.slice(1);
+  }
+
+  private logException(
+    exception: unknown,
+    request: Request,
+    status: HttpStatus,
+  ): void {
+    if (exception instanceof QueryFailedError) {
+      const driverError = exception.driverError as PostgresDriverError;
+
+      this.logger.error('Database exception', {
+        status,
+        method: request.method,
+        path: request.url,
+        code: driverError?.code,
+        detail: driverError?.detail,
+      });
+      return;
+    }
+
+    if (exception instanceof HttpException) {
+      this.logger.warn('HTTP exception', {
+        status,
+        method: request.method,
+        path: request.url,
+        message: exception.message,
+      });
+      return;
+    }
+
+    if (exception instanceof Error) {
+      this.logger.error('Unhandled exception', exception);
+      return;
+    }
+
+    this.logger.error('Unknown exception type', {
+      exception,
+      status,
+      path: request.url,
+    });
   }
 }

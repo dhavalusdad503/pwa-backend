@@ -13,15 +13,15 @@ export class AppLogger implements LoggerService {
     this.logger.info(message, meta);
   }
 
-  error(message: string, error?: unknown): void {
-    if (error instanceof Error) {
+  error(message: string, meta?: unknown): void {
+    if (meta instanceof Error) {
       this.logger.error(message, {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
+        message: meta.message,
+        stack: meta.stack,
+        name: meta.name,
       });
     } else {
-      this.logger.error(message, { error });
+      this.logger.error(message, meta);
     }
   }
 

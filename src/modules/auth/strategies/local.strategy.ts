@@ -7,7 +7,11 @@ import { Request } from 'express';
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   constructor(private readonly authService: AuthService) {
-    super({ usernameField: 'email', passReqToCallback: true });
+    super({
+      usernameField: 'email',
+      passwordField: 'password',
+      passReqToCallback: true,
+    });
   }
 
   async validate(req: Request, email: string, password: string) {
