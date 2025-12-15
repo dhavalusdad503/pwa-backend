@@ -10,6 +10,7 @@ import { IJwtOptions } from '@common/types';
 import { jwtConfig } from '@config/jwt.config';
 import { JwtTokenService } from './jwt-token.service';
 import { LocalStrategy } from './strategies/local.strategy';
+import { MailModule } from '@shared/mail/mail.module';
 
 @Module({
   controllers: [AuthController],
@@ -27,6 +28,7 @@ import { LocalStrategy } from './strategies/local.strategy';
       },
       inject: [ConfigService],
     }),
+    MailModule,
   ],
   providers: [AuthService, JwtTokenService, LocalStrategy],
 })

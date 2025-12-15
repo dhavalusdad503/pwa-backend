@@ -30,3 +30,4 @@ export const TEMPLATE_NAME = {
 };
 
 export const LOGGER_CONTEXT = 'App';
+export const RESET_PASS_TOKEN_EXPIRY_MINUTES = 10;

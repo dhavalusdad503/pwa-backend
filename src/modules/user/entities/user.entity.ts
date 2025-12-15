@@ -1,3 +1,4 @@
+import { UserStatus } from '@common/constants';
 import { OrgUser } from '@modules/org-user/entities/org-user.entity';
 import { Organization } from '@modules/organization/entities/organization.entity';
 import { Role } from '@modules/roles/entities/role.entity';
@@ -13,11 +14,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
-export enum UserStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-}
 
 export enum AuthProvider {
   EMAIL = 'EMAIL',

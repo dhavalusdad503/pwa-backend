@@ -5,7 +5,7 @@ import {
   IsNotEmpty,
   IsOptional,
 } from 'class-validator';
-import { AuthProvider, UserStatus } from '../entities/user.entity';
+import { AuthProvider } from '../entities/user.entity';
 
 export class CreateUserDto {
   @IsString()

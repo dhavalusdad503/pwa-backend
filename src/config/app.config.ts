@@ -14,7 +14,7 @@ export const configStore = () => ({
     jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1h',
   },
   secretKey: process.env.SECRET_KEY || 'defaultSecretKey',
-  frontendUrl: process.env.FRONTEND_URL || '',
+  frontendUrl: process.env.FRONTEND_BASE_URL || '',
   mail: {
     host: process.env.SMTP_HOST || 'smtp.example.com',
     port: parseInt(process.env.SMTP_PORT) || 587,

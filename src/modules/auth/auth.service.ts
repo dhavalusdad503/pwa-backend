@@ -1,16 +1,26 @@
 import {
+  HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { DEFAULT_ORGANIZATION_NAME } from '@common/constants';
-import { successResponse } from '@common/utils';
+import {
+  DEFAULT_ORGANIZATION_NAME,
+  RESET_PASS_TOKEN_EXPIRY_MINUTES,
+  UserStatus,
+} from '@common/constants';
+import { combineName, decrypt, encrypt, successResponse } from '@common/utils';
 import { UserService } from '@modules/user/user.service';
 import { OrganizationService } from '@modules/organization/organization.service';
 import { JwtTokenService } from './jwt-token.service';
 import { CreateUserDto } from '@modules/user/dto/create-user.dto';
 import { LoginUserResponse } from './auth.type';
+import { addMinutes } from 'date-fns';
+import { ConfigService } from '@nestjs/config';
+import { MailService } from '@shared/mail/mail.service';
+import { ResetPasswordDto } from './dto/index.dto';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +28,8 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly organizationService: OrganizationService,
     private readonly jwtTokenService: JwtTokenService,
+    private readonly configService: ConfigService,
+    private readonly mailService: MailService,
   ) {}
 
   async register(user: CreateUserDto) {
@@ -136,5 +148,136 @@ export class AuthService {
       { token, refreshToken },
       'Access token generated successfully',
     );
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.userService.findUserByEmail(email, {
+      select: ['id', 'email', 'firstName', 'lastName', 'status'],
+    });
+
+    if (user?.status !== UserStatus.ACTIVE) {
+      throw new HttpException('User is not active', HttpStatus.BAD_REQUEST);
+    }
+
+    const { id, firstName, lastName } = user;
+
+    const token = encrypt(
+      JSON.stringify({
+        id,
+        email,
+        tokenExpiryDate: addMinutes(
+          new Date(),
+          RESET_PASS_TOKEN_EXPIRY_MINUTES,
+        ),
+      }),
+    );
+
+    await this.userService.update(id, { resetPassToken: token });
+    const redirectUrl = `${this.configService.get('frontendUrl')}/reset-password?token=${token}`;
+
+    const name = combineName({ names: [firstName, lastName] });
+    await this.mailService.sendForgotPasswordMail(email, name, redirectUrl);
+
+    return successResponse(null, 'Password reset link sent to your email');
+  }
+
+  async validateToken(token: string) {
+    const tokenDetails = decrypt(token);
+    const tokenObj: { id: string; email: string; tokenExpiryDate: Date } =
+      tokenDetails && JSON.parse(tokenDetails);
+
+    if (!tokenObj) {
+      throw new HttpException('Invalid token', HttpStatus.BAD_REQUEST);
+    }
+
+    const user = await this.userService.findOne(tokenObj.id, {
+      select: ['resetPassToken'],
+    });
+
+    if (!user?.resetPassToken) {
+      throw new HttpException('Invalid token', HttpStatus.BAD_REQUEST);
+    }
+
+    const tokenExpiryDate = new Date(tokenObj?.tokenExpiryDate);
+    const now = new Date();
+    const isValidateToken = now < tokenExpiryDate;
+
+    if (!isValidateToken) {
+      throw new HttpException('Invalid token', HttpStatus.BAD_REQUEST);
+    }
+
+    return successResponse({ isValid: isValidateToken });
+  }
+
+  async resetPassword(data: ResetPasswordDto) {
+    const { token, new_password } = data;
+    const tokenDetails = decrypt(token);
+    const tokenObj: { id: string; email: string; tokenExpiryDate: Date } =
+      tokenDetails && JSON.parse(tokenDetails);
+
+    if (!tokenObj) {
+      throw new HttpException('Invalid token', HttpStatus.BAD_REQUEST);
+    }
+    const { id, tokenExpiryDate } = tokenObj;
+    if (new Date() > new Date(tokenExpiryDate)) {
+      throw new HttpException('Invalid token', HttpStatus.BAD_REQUEST);
+    }
+    const user = await this.userService.findOne(id, {
+      relations: ['role'],
+      select: [
+        'id',
+        'firstName',
+        'lastName',
+        'email',
+        'phone',
+        'resetPassToken',
+        'password',
+      ],
+    });
+
+    const storedToken = decodeURIComponent(user?.resetPassToken || '');
+    if (!user?.resetPassToken || (storedToken && storedToken !== token)) {
+      throw new HttpException('Invalid token', HttpStatus.BAD_REQUEST);
+    }
+
+    if (user.password) {
+      const isSamePassword = await bcrypt.compare(new_password, user.password);
+      if (isSamePassword) {
+        throw new HttpException(
+          'Your current and previous password could not be same',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
+    const orgId = await this.validateOrganization();
+    if (!orgId)
+      throw new HttpException('Organization not found', HttpStatus.BAD_REQUEST);
+
+    const hashedPassword = await bcrypt.hash(new_password, 10);
+    await this.userService.update(id, {
+      resetPassToken: null,
+      password: hashedPassword,
+    });
+
+    const loginUser = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone ?? null,
+      roleId: user.roleId ?? null,
+      role: user.role
+        ? {
+            id: user.roleId,
+            name: user.role.name,
+            slug: user.role.slug,
+          }
+        : null,
+    };
+
+    const loginResponse = this.login(loginUser, orgId);
+
+    return loginResponse;
   }
 }

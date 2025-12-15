@@ -8,7 +8,7 @@ export function createWinstonLogger(context: string): winston.Logger {
   const configService = new ConfigService();
   const logDir = join(
     process.cwd(),
-    configService.get('logs_dir') ?? process.env.LOG_DIR ?? 'logs',
+    configService.get('logs_dir') || process.env.LOG_DIR || 'logs',
   );
 
   const fileFormat = winston.format.combine(

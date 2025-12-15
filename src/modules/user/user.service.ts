@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
@@ -23,15 +23,24 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  findOne(id: string) {
-    return this.userRepository.findOne({ where: { id } });
+  findOne(id: string, options?: FindOneOptions<User>) {
+    return this.userRepository.findOne({ where: { id }, ...options });
   }
 
-  findUserByEmail(email: string) {
+  findUserByEmail(email: string, options?: FindOneOptions<User>) {
     return this.userRepository.findOne({
       where: { email },
       relations: ['role'],
+      ...options,
     });
+  }
+
+  async update(id: string, data: Partial<User>) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return this.userRepository.update(id, data);
   }
 
   // update(id: string, updateUserDto: UpdateUserDto) {

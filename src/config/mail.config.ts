@@ -27,7 +27,7 @@ export const mailConfig = (options?: IMailOptions): MailerOptions => {
       },
     },
     template: {
-      dir: path.join(__dirname, '../shared/email/templates'),
+      dir: path.join(__dirname, '/../shared/mail/templates'),
       adapter: new HandlebarsAdapter(),
       options: {
         strict: true,
