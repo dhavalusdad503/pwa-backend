@@ -1,6 +1,6 @@
+import { Organization } from '@modules/organization/entities/organization.entity';
+import { User } from '@modules/user/entities/user.entity';
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Organization } from '../../organization/entities/organization.entity';
-import { User } from 'src/modules/user/entities/user.entity';
 
 @Entity({ name: 'org_users' })
 export class OrgUser {

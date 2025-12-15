@@ -1,10 +1,10 @@
 import { DataSource } from 'typeorm';
 import { Seeder } from './seeder.interface';
-import { OrgUser } from '@/modules/org-user/entities/org-user.entity';
-import { Organization } from '@/modules/organization/entities/organization.entity';
-import { User } from '@/modules/user/entities/user.entity';
-import { DEFAULT_ORGANIZATION_NAME } from '@/common/constants';
 import { SeederLogger } from '.';
+import { OrgUser } from '@modules/org-user/entities/org-user.entity';
+import { Organization } from '@modules/organization/entities/organization.entity';
+import { User } from '@modules/user/entities/user.entity';
+import { DEFAULT_ORGANIZATION_NAME } from '@common/constants';
 
 export class OrgUsersSeeder implements Seeder {
   name = 'OrgUsersSeeder';

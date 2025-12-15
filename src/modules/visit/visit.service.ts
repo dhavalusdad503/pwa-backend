@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Visit } from './entities/visit.entity';
 import { DataSource, Repository } from 'typeorm';
-import { Organization } from '../organization/entities/organization.entity';
 import { Patient } from '../patient/entities/patient.entity';
+import { Organization } from '@modules/organization/entities/organization.entity';
 import { CreateVisitDto } from './dto/create-visit.dto';
 import { UpdateVisitDto } from './dto/update-visit.dto';
 

@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { QueryFailedError } from 'typeorm';
 import { Request, Response } from 'express';
-import { PostgresDriverError } from '../interface/error.interface';
-import { AppLogger } from '../logger/app.logger';
+import { AppLogger } from '@common/logger/app.logger';
+import { PostgresDriverError } from '@common/interface/error.interface';
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter<unknown> {

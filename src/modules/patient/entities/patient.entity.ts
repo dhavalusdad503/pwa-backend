@@ -1,3 +1,4 @@
+import { Organization } from '@modules/organization/entities/organization.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -7,7 +8,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Organization } from '../../organization/entities/organization.entity';
 
 @Entity({ name: 'patients' })
 export class Patient {

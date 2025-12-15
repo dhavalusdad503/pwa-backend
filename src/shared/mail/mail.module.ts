@@ -1,9 +1,9 @@
-import { IMailOptions } from '@/common/types';
-import { mailConfig } from '@/config/mail.config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MailService } from './mail.service';
 import { Module } from '@nestjs/common';
+import { IMailOptions } from '@common/types';
+import { mailConfig } from '@config/mail.config';
+import { MailService } from './mail.service';
 
 @Module({
   imports: [

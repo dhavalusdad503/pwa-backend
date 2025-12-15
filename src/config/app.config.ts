@@ -1,4 +1,4 @@
-import { parseInt } from '@/common/utils';
+import { parseInt } from '@common/utils';
 
 export const configStore = () => ({
   port: parseInt(process.env.PORT) || 3000,

@@ -1,9 +1,9 @@
 import { DataSource } from 'typeorm';
 import { Seeder } from './seeder.interface';
-import { Patient } from '@/modules/patient/entities/patient.entity';
-import { Organization } from '@/modules/organization/entities/organization.entity';
-import { DEFAULT_ORGANIZATION_NAME } from '@/common/constants';
 import { SeederLogger } from '.';
+import { Patient } from '@modules/patient/entities/patient.entity';
+import { Organization } from '@modules/organization/entities/organization.entity';
+import { DEFAULT_ORGANIZATION_NAME } from '@common/constants';
 
 export class PatientSeeder implements Seeder {
   name = 'PatientSeeder';

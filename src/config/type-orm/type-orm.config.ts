@@ -2,8 +2,8 @@ import 'dotenv/config';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { Entities } from './entities';
-import { parseInt } from 'src/common/utils';
-import { IDbOptions } from '@/common/types';
+import { IDbOptions } from '@common/types';
+import { parseInt } from '@common/utils';
 
 const DB_PORT = 5432;
 const MAX_POOL_SIZE = 100;

@@ -1,4 +1,4 @@
-import { AppLogger } from '@/common/logger/app.logger';
+import { AppLogger } from '@common/logger/app.logger';
 import { SeederManager } from './seeder.manager';
 
 export const SeederLogger = new AppLogger('Seeder');

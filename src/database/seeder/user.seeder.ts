@@ -1,10 +1,10 @@
 import { DataSource } from 'typeorm';
 import { Seeder } from './seeder.interface';
-import { Role } from '@/modules/roles/entities/role.entity';
-import { User } from '@/modules/user/entities/user.entity';
-import { Roles, UserRoleSlugs, UserStatus } from '@/common/constants';
 import bcrypt from 'bcrypt';
 import { SeederLogger } from '.';
+import { Role } from '@modules/roles/entities/role.entity';
+import { User } from '@modules/user/entities/user.entity';
+import { Roles, UserRoleSlugs, UserStatus } from '@common/constants';
 
 export class UserSeeder implements Seeder {
   name = 'UserSeeder';

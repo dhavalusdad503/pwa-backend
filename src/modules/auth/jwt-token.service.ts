@@ -1,7 +1,7 @@
 // src/auth/jwt-token.service.ts
+import { AuthTokenPayload } from '@common/types';
 import { Injectable } from '@nestjs/common';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
-import { AuthTokenPayload } from '../../common/types';
 
 export type ExpiresIn = JwtSignOptions['expiresIn'];
 

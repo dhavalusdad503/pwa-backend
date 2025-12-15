@@ -1,10 +1,10 @@
-import AppDataSource from '@/config/type-orm/type-orm.config';
 import { OrgUsersSeeder } from './org-user.seeder';
 import { OrganizationSeeder } from './organization.seeder';
 import { PatientSeeder } from './patient.seeder';
 import { RoleSeeder } from './role.seeder';
 import { UserSeeder } from './user.seeder';
 import { SeederLogger } from '.';
+import AppDataSource from '@config/type-orm/type-orm.config';
 
 export class SeederManager {
   private seeders;

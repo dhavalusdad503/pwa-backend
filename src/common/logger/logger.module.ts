@@ -1,6 +1,6 @@
 import { Global, Module } from '@nestjs/common';
+import { LOGGER_CONTEXT } from '@common/constants';
 import { AppLogger } from './app.logger';
-import { LOGGER_CONTEXT } from '../constants';
 
 @Global()
 @Module({

@@ -1,7 +1,7 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
-import { TEMPLATE_NAME } from '@/common/constants';
-import { AppLogger } from '@/common/logger/app.logger';
+import { AppLogger } from '@common/logger/app.logger';
+import { TEMPLATE_NAME } from '@common/constants';
 
 @Injectable()
 export class MailService {

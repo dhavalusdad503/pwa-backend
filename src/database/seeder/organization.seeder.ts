@@ -1,8 +1,8 @@
 import { DataSource } from 'typeorm';
 import { Seeder } from './seeder.interface';
-import { Organization } from '@/modules/organization/entities/organization.entity';
-import { DEFAULT_ORGANIZATION_NAME } from '@/common/constants';
 import { SeederLogger } from '.';
+import { Organization } from '@modules/organization/entities/organization.entity';
+import { DEFAULT_ORGANIZATION_NAME } from '@common/constants';
 
 export class OrganizationSeeder implements Seeder {
   name = 'OrganizationSeeder';

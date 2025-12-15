@@ -1,3 +1,4 @@
+import { ApiResponse } from '@common/interface/api-response.interface';
 import {
   Injectable,
   NestInterceptor,
@@ -6,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiResponse } from '../interface/api-response.interface';
 
 type ControllerResponse<T> =
   | T

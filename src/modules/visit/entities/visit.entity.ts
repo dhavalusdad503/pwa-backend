@@ -1,6 +1,6 @@
-import { Organization } from 'src/modules/organization/entities/organization.entity';
-import { Patient } from 'src/modules/patient/entities/patient.entity';
-import { User } from 'src/modules/user/entities/user.entity';
+import { Organization } from '@modules/organization/entities/organization.entity';
+import { Patient } from '@modules/patient/entities/patient.entity';
+import { User } from '@modules/user/entities/user.entity';
 import {
   Entity,
   Column,

@@ -1,3 +1,6 @@
+import { OrgUser } from '@modules/org-user/entities/org-user.entity';
+import { Patient } from '@modules/patient/entities/patient.entity';
+import { User } from '@modules/user/entities/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -8,9 +11,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { OrgUser } from '../../org-user/entities/org-user.entity';
-import { User } from 'src/modules/user/entities/user.entity';
-import { Patient } from 'src/modules/patient/entities/patient.entity';
 
 @Entity({ name: 'organizations' })
 export class Organization {

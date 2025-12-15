@@ -1,9 +1,9 @@
 import 'dotenv/config';
-import { IMailOptions } from '@/common/types';
-import { parseInt } from '@/common/utils';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { MailerOptions } from '@nestjs-modules/mailer';
 import * as path from 'path';
+import { IMailOptions } from '@common/types';
+import { parseInt } from '@common/utils';
 
 export const mailConfig = (options?: IMailOptions): MailerOptions => {
   const mailConfiguration: MailerOptions = {

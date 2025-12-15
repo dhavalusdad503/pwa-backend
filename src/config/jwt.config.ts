@@ -1,7 +1,7 @@
 import 'dotenv/config';
-import { IJwtOptions } from '@/common/types';
 import { JwtModuleOptions } from '@nestjs/jwt';
-import { parseInt } from '@/common/utils';
+import { IJwtOptions } from '@common/types';
+import { parseInt } from '@common/utils';
 
 export const jwtConfig = (option?: IJwtOptions): JwtModuleOptions => {
   const jwtConfiguration: JwtModuleOptions = {

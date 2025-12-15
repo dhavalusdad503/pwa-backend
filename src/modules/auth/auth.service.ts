@@ -3,14 +3,14 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateUserDto } from '../user/dto/create-user.dto';
-import { UserService } from '../user/user.service';
-import { JwtTokenService } from './jwt-token.service';
 import * as bcrypt from 'bcrypt';
+import { DEFAULT_ORGANIZATION_NAME } from '@common/constants';
+import { successResponse } from '@common/utils';
+import { UserService } from '@modules/user/user.service';
+import { OrganizationService } from '@modules/organization/organization.service';
+import { JwtTokenService } from './jwt-token.service';
+import { CreateUserDto } from '@modules/user/dto/create-user.dto';
 import { LoginUserResponse } from './auth.type';
-import { OrganizationService } from '../organization/organization.service';
-import { DEFAULT_ORGANIZATION_NAME } from '@/common/constants';
-import { successResponse } from '@/common/utils';
 
 @Injectable()
 export class AuthService {

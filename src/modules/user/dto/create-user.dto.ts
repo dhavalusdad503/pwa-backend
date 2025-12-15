@@ -1,5 +1,11 @@
-import { IsEmail, IsEnum, IsString, IsNotEmpty, IsOptional } from "class-validator";
-import { AuthProvider, UserStatus } from "../entities/user.entity";
+import {
+  IsEmail,
+  IsEnum,
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+} from 'class-validator';
+import { AuthProvider, UserStatus } from '../entities/user.entity';
 
 export class CreateUserDto {
   @IsString()

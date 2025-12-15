@@ -1,3 +1,6 @@
+import { OrgUser } from '@modules/org-user/entities/org-user.entity';
+import { Organization } from '@modules/organization/entities/organization.entity';
+import { Role } from '@modules/roles/entities/role.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -10,9 +13,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Organization } from '../../organization/entities/organization.entity';
-import { OrgUser } from '../../org-user/entities/org-user.entity';
-import { Role } from 'src/modules/roles/entities/role.entity';
 
 export enum UserStatus {
   ACTIVE = 'ACTIVE',

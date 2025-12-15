@@ -12,12 +12,8 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { CreateVisitDto } from './dto/create-visit.dto';
-import { Roles } from 'src/common/constants';
-import { AuthTokenPayload } from '@/common/types';
-
-export interface AuthRequest extends Request {
-  user: AuthTokenPayload;
-}
+import type { AuthRequest } from '@common/interface/request.interface';
+import { Roles } from '@common/constants';
 
 @Controller('visit')
 export class VisitController {

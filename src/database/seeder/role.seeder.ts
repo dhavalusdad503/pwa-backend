@@ -1,8 +1,8 @@
 import { DataSource } from 'typeorm';
 import { Seeder } from './seeder.interface';
-import { Role } from '@/modules/roles/entities/role.entity';
-import { Roles, UserRoleSlugs } from '@/common/constants';
 import { SeederLogger } from '.';
+import { Role } from '@modules/roles/entities/role.entity';
+import { Roles, UserRoleSlugs } from '@common/constants';
 
 export class RoleSeeder implements Seeder {
   name = 'RoleSeeder';
