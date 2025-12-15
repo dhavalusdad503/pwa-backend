@@ -5,7 +5,6 @@ import { configStore } from '@config/app.config';
 import { IDbOptions } from '@common/types';
 import { generateDataSourceOptions } from '@config/type-orm/type-orm.config';
 import { Entities } from '@config/type-orm/entities';
-import { LoggerModule } from '@common/logger/logger.module';
 import { CommonModule } from '@common/common.module';
 import { MailModule } from '@shared/mail/mail.module';
 import { AuthModule } from '@modules/auth/auth.module';
@@ -35,7 +34,6 @@ import { UserModule } from '@modules/user/user.module';
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([...Entities]),
-    LoggerModule,
     CommonModule,
     MailModule,
     AuthModule,

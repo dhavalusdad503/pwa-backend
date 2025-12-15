@@ -30,4 +30,5 @@ export const TEMPLATE_NAME = {
 };
 
 export const LOGGER_CONTEXT = 'App';
+export const DECORATOR_ROLES_KEY = 'roles';
 export const RESET_PASS_TOKEN_EXPIRY_MINUTES = 10;
