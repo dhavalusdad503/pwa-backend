@@ -6,6 +6,7 @@ import { FindOneOptions, Repository } from 'typeorm';
 import { AuthTokenPayload, CommonPaginationOptionType } from '@common/types';
 import { QueryBuilderService } from '@common/utils/queryBuilder/queryBuilder.service';
 import usersFieldsMap from './dto/userFieldMap';
+import { Roles } from '@common/constants';
 
 @Injectable()
 export class UserService {
@@ -13,7 +14,7 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly queryBuilderService: QueryBuilderService,
-  ) { }
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     const user = await this.userRepository.save(createUserDto);
@@ -23,32 +24,51 @@ export class UserService {
     });
   }
 
-  async findAll(user: AuthTokenPayload, params: CommonPaginationOptionType & {
-    userType?: string
-    column?: string | string[]
-  }) {
-
-    const { org_id } = user;
-    const { page = 1, limit = 10 } = params; 
+  async findAll(
+    user: AuthTokenPayload,
+    params: CommonPaginationOptionType & {
+      userType?: string;
+      column?: string | string[];
+    },
+  ) {
+    const { org_id, role } = user;
+    const { page = 1, limit = 10 } = params;
     const skip = (page - 1) * limit;
 
-    const defaultColumns = ['id', 'firstName', 'lastName', 'email', 'phone', 'createdAt', 'updatedAt'];
+    if (
+      role === Roles.SUPERVISOR &&
+      [Roles.SUPERVISOR, Roles.ADMIN].includes(
+        params.userType?.toUpperCase() as Roles,
+      )
+    ) {
+      params.userType = Roles.CAREGIVER;
+    }
+
+    const defaultColumns = [
+      'id',
+      'firstName',
+      'lastName',
+      'email',
+      'phone',
+      'createdAt',
+      'updatedAt',
+    ];
     const queryBuilder = this.queryBuilderService.buildQuery(
       usersFieldsMap,
       defaultColumns,
       params.column,
       {
-        where: {  
+        where: {
           userOrgs: { orgId: org_id },
-          role: { name: params.userType },
+          role: { name: params.userType?.toUpperCase() },
         },
         skip,
         take: limit,
-      }
+      },
     );
 
     const [rows, count] = await this.userRepository.findAndCount(queryBuilder);
-    
+
     return { rows, count };
   }
 

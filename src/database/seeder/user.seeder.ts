@@ -54,7 +54,7 @@ export class UserSeeder implements Seeder {
         {
           firstName: 'Super',
           lastName: 'Visor',
-          email: 'SuperVisor@yopmail.com',
+          email: 'supervisor@yopmail.com',
           roleId: supervisorRole?.id,
           status: UserStatus.ACTIVE,
           password: await bcrypt.hash('Supervisor@123', 10),
