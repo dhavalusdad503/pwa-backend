@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsString,
   IsUUID,
@@ -28,7 +29,6 @@ export class CreateVisitDto {
   @IsDateString()
   endedAt: Date;
 
-  @IsOptional()
   @IsDateString()
   submittedAt?: Date;
 
@@ -36,24 +36,29 @@ export class CreateVisitDto {
   @IsString()
   address: string;
 
+  @Type(() => Boolean)
   @IsBoolean()
   attestation: boolean;
 
   @IsString()
   attestationName: string;
 
+  @Type(() => Boolean)
   @IsOptional()
   @IsBoolean()
   followUp: boolean;
 
+  @Type(() => Boolean)
   @IsOptional()
   @IsBoolean()
   clientPresent: boolean;
 
+  @Type(() => Boolean)
   @IsOptional()
   @IsBoolean()
   medicationReviewed: boolean;
 
+  @Type(() => Boolean)
   @IsOptional()
   @IsBoolean()
   safetyCheck: boolean;
@@ -61,6 +66,7 @@ export class CreateVisitDto {
   @IsString()
   patientName: string;
 
+  @IsOptional()
   @IsString()
   notes: string;
 
@@ -68,9 +74,13 @@ export class CreateVisitDto {
   serviceType: string;
 
   // Geo
+  @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   latitude: number;
 
+  @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   longitude: number;
 
@@ -87,6 +97,11 @@ export class CreateVisitDto {
   @IsString()
   orgName: string;
 
+  @IsOptional()
   @IsUUID()
   id: string;
+
+  @IsOptional()
+  @IsString()
+  path?: string;
 }

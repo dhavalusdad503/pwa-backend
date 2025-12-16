@@ -7,6 +7,9 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
 @Entity({ name: 'visits' })
@@ -50,17 +53,17 @@ export class Visit {
   @Column({ type: 'timestamp', name: 'ended_at' })
   endedAt: Date;
 
-  @Column({ type: 'timestamp', name: 'submitted_at', nullable: true })
+  @Column({ type: 'timestamp', name: 'submitted_at' })
   submittedAt: Date;
 
   @Column({ type: 'varchar', name: 'service_type', length: 100 })
   serviceType: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   notes: string;
 
-  // @Column({ type: 'text' })
-  // address: string;
+  @Column({ type: 'text' })
+  address: string;
 
   @Column({
     type: 'decimal',
@@ -86,15 +89,50 @@ export class Visit {
   @Column({ type: 'varchar', name: 'attestation_name' })
   attestationName: string;
 
-  @Column({ type: 'boolean', name: 'client_present' })
+  @Column({
+    type: 'boolean',
+    name: 'client_present',
+    nullable: true,
+    default: false,
+  })
   clientPresent: boolean;
 
-  @Column({ type: 'boolean', name: 'follow_up' })
+  @Column({
+    type: 'boolean',
+    name: 'follow_up',
+    nullable: true,
+    default: false,
+  })
   followUp: boolean;
 
-  @Column({ type: 'boolean', name: 'medication_reviewed' })
+  @Column({
+    type: 'boolean',
+    name: 'medication_reviewed',
+    nullable: true,
+    default: false,
+  })
   medicationReviewed: boolean;
 
-  @Column({ type: 'boolean', name: 'safety_check' })
+  @Column({
+    type: 'boolean',
+    name: 'safety_check',
+    nullable: true,
+    default: false,
+  })
   safetyCheck: boolean;
+
+  // ------------------------------
+  // AUDIT COLUMNS
+  // ------------------------------
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt: Date;
+
+  // Not persisted
+  tempId?: number;
 }
