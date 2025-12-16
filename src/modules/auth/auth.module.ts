@@ -11,6 +11,7 @@ import { jwtConfig } from '@config/jwt.config';
 import { JwtTokenService } from './jwt-token.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { MailModule } from '@shared/mail/mail.module';
+import { JwtStrategy } from '@common/strategies/jwt.strategy';
 
 @Module({
   controllers: [AuthController],
@@ -30,6 +31,6 @@ import { MailModule } from '@shared/mail/mail.module';
     }),
     MailModule,
   ],
-  providers: [AuthService, JwtTokenService, LocalStrategy],
+  providers: [AuthService, JwtTokenService, LocalStrategy, JwtStrategy],
 })
-export class AuthModule {}
+export class AuthModule { }
