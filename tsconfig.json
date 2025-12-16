@@ -1,34 +1,31 @@
 {
-  "compileOnSave": false,
-  "ts-node": {
-    "require": ["tsconfig-paths/register"],
-    "transpileOnly": true
-  },
   "compilerOptions": {
-    "target": "ES6",
-    "module": "CommonJS",
-    "outDir": "dist",
-    "rootDir": "src",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "resolvePackageJsonExports": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2023",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
     "skipLibCheck": true,
-
-    // 👇 keep this for your path aliases to work (for now)
-    "baseUrl": ".",
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "noFallthroughCasesInSwitch": false,
     "paths": {
       "@*": ["src/*"],
-      "@models/*": ["src/models/*"],
-      "@controllers/*": ["src/controllers/*"],
-      "@features/*": ["src/features/*"],
-      "@middlewares/*": ["src/middlewares/*"],
-      "@utils/*": ["src/utils/*"],
-      "@config/*": ["src/config/*"]
-    },
-
-    // 👇 add this line to silence the deprecation warning
-    // "ignoreDeprecations": "6.0"
-  },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+      "@common/*": ["src/common/*"],
+      "@config/*": ["src/config/*"],
+      "@modules/*": ["src/modules/*"]
+    }
+  }
 }
