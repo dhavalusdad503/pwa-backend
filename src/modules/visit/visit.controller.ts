@@ -13,6 +13,7 @@ import {
   UseGuards,
   UploadedFile,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { CreateVisitDto } from './dto/create-visit.dto';
 import type { AuthRequest } from '@common/interface/request.interface';
@@ -55,8 +56,10 @@ export class VisitController {
   @Get()
   async getAllVisit(
     @Req() req: AuthRequest,
-    @Param() params: CommonPaginationOptionType,
+    @Query('columns[]') columns: string[],
+    @Query() params: CommonPaginationOptionType,
   ) {
+
     const { id, role, org_id } = req.user;
 
     const typeRole = role as Roles;
@@ -71,12 +74,12 @@ export class VisitController {
       case Roles.CAREGIVER:
         return await this.visitService.getAllVisits(id);
       case Roles.SUPERVISOR:
+      case Roles.ADMIN:
         return await this.visitService.getAllVisitsByOrganization(
           org_id,
           paginationOption(params),
+          columns
         );
-      case Roles.ADMIN:
-        break;
       default:
         throw new HttpException('Unauthorized access', HttpStatus.UNAUTHORIZED);
     }

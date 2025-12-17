@@ -158,6 +158,7 @@ export class VisitService {
       startDate?: string;
       endDate?: string;
     },
+    columns?: string[],
   ) {
     const {
       limit = 10,
@@ -199,6 +200,8 @@ export class VisitService {
       }
     }
 
+    const defaultColumns = ['id', 'serviceType', 'notes', 'createdAt', 'updatedAt'];
+    const columnsToSelect = Array.from(new Set([...defaultColumns, ...(columns ? columns : [])]));
     // Using QueryBuilder for search with OR condition
     const queryBuilder = this.visitRepository
       .createQueryBuilder('visit')
@@ -206,13 +209,8 @@ export class VisitService {
       .leftJoinAndSelect('visit.caregiver', 'caregiver')
       .where('visit.orgId = :orgId', { orgId })
       .select([
-        'visit.id',
-        'visit.serviceType',
-        'visit.notes',
-        'visit.createdAt',
-        'visit.updatedAt',
-        'visit.orgId',
-        // Add other fields you need, excluding caregiverId and patientId
+        ...columnsToSelect.map((column) => `visit.${column}`),
+        // manually add association columns  
         'patient.id',
         'patient.name',
         'caregiver.id',
@@ -277,18 +275,18 @@ export class VisitService {
     }
 
     // Pagination
-    const [data, total] = await queryBuilder
+    const [rows, total] = await queryBuilder
       .skip(skip)
       .take(limit)
       .getManyAndCount();
 
     return successResponse(
       {
-        data,
+        rows,
         total,
         page,
         limit,
-        hasMore: skip + data.length < total,
+        hasMore: skip + rows.length < total,
       },
       'Visit fetch successfully',
     );
