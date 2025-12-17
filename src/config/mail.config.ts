@@ -21,6 +21,10 @@ export const mailConfig = (options?: IMailOptions): MailerOptions => {
       greetingTimeout: 10_000,
       socketTimeout: 10_000,
 
+      tls: {
+        rejectUnauthorized: false,
+      },
+
       auth: {
         user: options?.user ?? process.env.SMTP_USER ?? 'user',
         pass: options?.password ?? process.env.SMTP_PASSWORD ?? 'password',
