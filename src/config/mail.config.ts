@@ -17,9 +17,9 @@ export const mailConfig = (options?: IMailOptions): MailerOptions => {
       maxMessages: 100, // Max emails per connection
 
       // ✅ REQUIRED FOR RENDER
-      connectionTimeout: 10_000,
-      greetingTimeout: 10_000,
-      socketTimeout: 10_000,
+      connectionTimeout: 60_000,
+      greetingTimeout: 60_000,
+      socketTimeout: 60_000,
 
       tls: {
         rejectUnauthorized: false, // Help with self-signed certs or proxy issues
