@@ -5,7 +5,7 @@ export const configStore = () => ({
   database: {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT) || 5432,
-    username: process.env.DB_USERNAME || 'postgres',
+    username: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'password',
     name: process.env.DB_NAME || 'app_db',
   },
@@ -23,4 +23,5 @@ export const configStore = () => ({
     from: process.env.SMTP_FROM || 'mail',
   },
   logs_dir: process.env.LOG_DIR || 'logs',
+  node_env: process.env.NODE_ENV || '',
 });

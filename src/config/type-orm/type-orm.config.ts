@@ -16,7 +16,7 @@ export const generateDataSourceOptions = (
     type: 'postgres',
     host: options?.host ?? process.env?.DB_HOST ?? 'localhost',
     port: parseInt(options?.port ?? process.env?.DB_PORT) ?? DB_PORT,
-    username: options?.username ?? process.env?.DB_USERNAME ?? 'postgres',
+    username: options?.username ?? process.env?.DB_USER ?? 'postgres',
     password: options?.password ?? process.env?.DB_PASSWORD ?? 'postgres',
     database: options?.name ?? process.env?.DB_NAME ?? 'users_db',
     synchronize: false,
@@ -32,6 +32,10 @@ export const generateDataSourceOptions = (
       // connection timeout
       // connectionTimeoutMillis: CONNECTION_TIMEOUT_MILLIS,
     },
+    ssl:
+      process.env.NODE_ENV === 'development'
+        ? false
+        : { rejectUnauthorized: false },
   };
   return dataSource;
 };

@@ -24,6 +24,7 @@ export class MailService {
       this.logger.log('✉️ Forgot Password Mail Sent Successfully');
       return 'Email Sent Successful';
     } catch (error) {
+      console.log('logs mail', error);
       this.logger.error('❌ Forgot Password Send mail error', error);
       throw new ServiceUnavailableException('Email service unavailable');
     }

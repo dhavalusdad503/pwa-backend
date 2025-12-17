@@ -108,7 +108,7 @@ export class VisitService {
   }
 
   async getAllVisits(id: string) {
-    const visitData = await this.visitRepository.find({
+    const data = await this.visitRepository.find({
       where: { caregiverId: id },
       relations: {
         patient: true, // relation defined in Visit entity
@@ -142,12 +142,7 @@ export class VisitService {
         },
       },
     });
-    return successResponse(
-      {
-        visitData,
-      },
-      'Visit fetch successfully',
-    );
+    return successResponse({ data }, 'Visit fetch successfully');
   }
 
   async getAllVisitsByOrganization(
