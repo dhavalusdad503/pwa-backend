@@ -6,6 +6,7 @@ import {
   IsOptional,
 } from 'class-validator';
 import { AuthProvider } from '../entities/user.entity';
+import { Roles } from '@common/constants';
 
 export class CreateUserDto {
   @IsString()
@@ -32,6 +33,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   authProvider: AuthProvider;
 
-  @IsOptional() //temorary
-  roleId?: string;
+  @IsOptional()
+  @IsEnum(Roles)
+  role?: string;
 }

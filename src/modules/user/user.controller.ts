@@ -26,9 +26,11 @@ import { RolesDecorator } from '@common/decorators/roles.decorator';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    // return this.userService.create(createUserDto);
+  @RolesDecorator(Roles.ADMIN, Roles.SUPERVISOR)
+  @UseGuards(RolesGuard)
+  @Post('create')
+  create(@User() user: AuthTokenPayload,@Body() createUserDto: CreateUserDto) {
+    return this.userService.create(createUserDto,user);
   }
 
   @RolesDecorator(Roles.ADMIN, Roles.SUPERVISOR)

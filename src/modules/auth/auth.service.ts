@@ -32,40 +32,40 @@ export class AuthService {
     private readonly mailService: MailService,
   ) {}
 
-  async register(user: CreateUserDto) {
-    const userByEmail = await this.userService.findUserByEmail(user.email);
+  // async register(user: CreateUserDto) {
+  //   const userByEmail = await this.userService.findUserByEmail(user.email);
 
-    if (userByEmail) {
-      throw new UnauthorizedException('User already exists');
-    }
-    user.roleId = '5f0c0b4d-6c3d-4f0c-9a89-9f7e3ccaa4b1'; //temporary
-    const newUser = await this.userService.create(user);
+  //   if (userByEmail) {
+  //     throw new UnauthorizedException('User already exists');
+  //   }
+  //   // user.roleId = '5f0c0b4d-6c3d-4f0c-9a89-9f7e3ccaa4b1'; //temporary
+  //   const newUser = await this.userService.create(user);
 
-    if (!newUser) {
-      throw new InternalServerErrorException('Something went wrong');
-    }
+  //   if (!newUser) {
+  //     throw new InternalServerErrorException('Something went wrong');
+  //   }
 
-    const token = this.jwtTokenService.createJWTToken({
-      email: newUser.email,
-      role: newUser.role.name,
-      id: newUser.id,
-      role_id: newUser.roleId,
-    });
+  //   const token = this.jwtTokenService.createJWTToken({
+  //     email: newUser.email,
+  //     role: newUser.role.name,
+  //     id: newUser.id,
+  //     role_id: newUser.roleId,
+  //   });
 
-    const createdUser = {
-      email: newUser.email,
-      firstName: newUser.firstName,
-      lastName: newUser.lastName,
-      phone: newUser.phone,
-      role: newUser.role.name,
-    };
+  //   const createdUser = {
+  //     email: newUser.email,
+  //     firstName: newUser.firstName,
+  //     lastName: newUser.lastName,
+  //     phone: newUser.phone,
+  //     role: newUser.role.name,
+  //   };
 
-    return {
-      message: 'User registered successfully',
-      user: createdUser,
-      token,
-    };
-  }
+  //   return {
+  //     message: 'User registered successfully',
+  //     user: createdUser,
+  //     token,
+  //   };
+  // }
 
   async validateUser(
     email: string,

@@ -23,10 +23,10 @@ import {
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('register')
-  register(@Body() createUserDto: CreateUserDto) {
-    return this.authService.register(createUserDto);
-  }
+  // @Post('register')
+  // register(@Body() createUserDto: CreateUserDto) {
+  //   return this.authService.register(createUserDto);
+  // }
 
   @UseGuards(AuthGuard('local'))
   @Post('login')
